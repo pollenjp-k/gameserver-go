@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/pollenjp-k/gameserver-go/api/config"
+	"github.com/pollenjp/gameserver-go/api/config"
 )
 
 // multiplexer

@@ -7,8 +7,8 @@ import (
 	"net"
 	"os"
 
-	"github.com/pollenjp-k/gameserver-go/api"
-	"github.com/pollenjp-k/gameserver-go/api/config"
+	"github.com/pollenjp/gameserver-go/api"
+	"github.com/pollenjp/gameserver-go/api/config"
 )
 
 func main() {
