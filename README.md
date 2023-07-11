@@ -7,6 +7,12 @@ This repository is **golang**-implemented [KLabServerCamp/gameserver](https://gi
 | Original | Python   | <https://github.com/KLabServerCamp/gameserver> |
 | This     | Golang   | this repo |
 
+## run
+
+```sh
+make run
+```
+
 ## Debug
 
 ```sh
