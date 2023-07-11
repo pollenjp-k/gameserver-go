@@ -2,10 +2,11 @@ ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 PROJECT_NAME := $(shell basename "${ROOT}")
 COMPOSE_FILE := _docker/docker-compose.yml
 COMPOSE_ARGS := -f "${COMPOSE_FILE}" -p "${PROJECT_NAME}"
+GO_COMMAND := go1.20.5
 
 .PHONY: run
 run:
-	go run .
+	${GO_COMMAND} run .
 
 .PHONY: db-up
 db-up: ## Run docker compose up in the background
