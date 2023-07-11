@@ -1,3 +1,3 @@
-module github.com/pollenjp/gameserver-go
+module github.com/pollenjp-k/gameserver-go
 
 go 1.20
