@@ -6,3 +6,14 @@ This repository is [KLabServerCamp/gameserver](https://github.com/KLabServerCamp
 |:--       |:--       |:--   |
 | Original | Python   | <https://github.com/KLabServerCamp/gameserver> |
 | This     | Golang   | this repo |
+
+## Debug
+
+```sh
+make db-exec
+```
+
+```sql
+USE webapp;
+SHOW tables;
+```
