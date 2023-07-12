@@ -7,7 +7,7 @@ import (
 	"github.com/pollenjp/gameserver-go/api/repository"
 )
 
-//go:generate go run github.com/matryer/moq -out register_user_moq_test.go . UserExtractor
+//go:generate go run github.com/matryer/moq -out get_user_moq_test.go . UserGetter
 type UserGetter interface {
 	GetUserFromId(ctx context.Context, db repository.Queryer, userId entity.UserID) (*entity.User, error)
 }
