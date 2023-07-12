@@ -25,10 +25,30 @@ var (
 	ErrAlreadyEntry = errors.New("duplicate entry")
 )
 
+// defer のように複数のCleanUp処理を渡せるようにする
+// @pollenjp のお遊び
+type CleanUpContainer struct {
+	funcs []func()
+}
+
+func (c *CleanUpContainer) Add(f func()) {
+	// 戦闘に挿入
+	c.funcs = append([]func(){f}, c.funcs...)
+}
+
+func (c *CleanUpContainer) GetCleanUp() func() {
+	return func() {
+		for _, f := range c.funcs {
+			f()
+		}
+	}
+}
+
 // databaseとのコネクションを確立する
 // return. (db, cleanup func, error)
 func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
-	// sqlx.Connectを使うと内部でpingする。
+	cleanUpContainer := &CleanUpContainer{}
+
 	db, err := sql.Open("mysql",
 		fmt.Sprintf(
 			"%s:%s@tcp(%s:%d)/%s?parseTime=true",
@@ -38,18 +58,17 @@ func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 		),
 	)
 	if err != nil {
-		return nil, func() {}, err
+		return nil, cleanUpContainer.GetCleanUp(), err
 	}
-	// Open は実際に接続テストが行われない。
+	cleanUpContainer.Add(func() {
+		_ = db.Close()
+	})
+
 	pingDB := func(trial int) error {
 		ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
 		defer cancel()
 		if err := db.PingContext(ctx); err != nil {
-			time.Sleep(1 * time.Second)
-			return err
-		}
-		if err := db.PingContext(ctx); err != nil {
-			log.Printf("DB Connection (%d): %s", trial, err.Error())
+			log.Printf("DB Connection (trial:%d): %s", trial, err.Error())
 			return err
 		}
 		return nil
@@ -61,7 +80,7 @@ func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 		if err := pingDB(trial); err != nil {
 			if trial > 30 {
 				log.Println("Couldn't connect to database.")
-				return nil, func() { _ = db.Close() }, err
+				return nil, cleanUpContainer.GetCleanUp(), err
 			}
 			time.Sleep(1 * time.Second)
 			continue
@@ -72,7 +91,7 @@ func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 	}
 
 	xdb := sqlx.NewDb(db, "mysql")
-	return xdb, func() { _ = db.Close() }, nil
+	return xdb, cleanUpContainer.GetCleanUp(), nil
 }
 
 // Repository はデータベースへのアクセスを提供する
