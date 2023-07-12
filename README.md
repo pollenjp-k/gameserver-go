@@ -15,7 +15,7 @@ make up
 
 access to open port (See `docker-compose.yml` for more details.)
 
-## Debug
+## Debug DB
 
 ```sh
 make db-exec
