@@ -7,11 +7,13 @@ This repository is **golang**-implemented [KLabServerCamp/gameserver](https://gi
 | Original | Python   | <https://github.com/KLabServerCamp/gameserver> |
 | This     | Golang   | this repo |
 
-## run
+## local run
 
 ```sh
-make run
+make up
 ```
+
+access to open port (See `docker-compose.yml` for more details.)
 
 ## Debug
 
