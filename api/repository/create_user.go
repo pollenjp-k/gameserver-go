@@ -24,6 +24,8 @@ func (r *Repository) CreateUser(
 	u.CreatedAt = r.Clocker.Now()
 	u.UpdatedAt = r.Clocker.Now()
 
+	// TODO: token が unique でなかった場合に5回程リトライする
+
 	sql := `INSERT INTO
 		user (
 			name,
