@@ -49,6 +49,10 @@ func (c *CleanUpContainer) GetCleanUp() func() {
 func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 	cleanUpContainer := &CleanUpContainer{}
 
+	cleanUpContainer.Add(func() {
+		log.Printf("1st cleanup")
+	})
+
 	db, err := sql.Open("mysql",
 		fmt.Sprintf(
 			"%s:%s@tcp(%s:%d)/%s?parseTime=true",
@@ -61,6 +65,7 @@ func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 		return nil, cleanUpContainer.GetCleanUp(), err
 	}
 	cleanUpContainer.Add(func() {
+		log.Printf("db close cleanup")
 		_ = db.Close()
 	})
 
