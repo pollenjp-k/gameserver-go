@@ -5,7 +5,12 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
+	"github.com/pollenjp/gameserver-go/api/clock"
 	"github.com/pollenjp/gameserver-go/api/config"
+	"github.com/pollenjp/gameserver-go/api/handler"
+	"github.com/pollenjp/gameserver-go/api/repository"
+	"github.com/pollenjp/gameserver-go/api/service"
 )
 
 // multiplexer
@@ -23,36 +28,26 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 		},
 	)
 
-	// TODO: not implemented yet
-	cleanup := func() {}
-	// db, cleanup, err := store.New(ctx, cfg)
-	// if err != nil {
-	// 	return nil, cleanup, err
-	// }
-	// c := clock.RealClocker{}
-	// r := &store.Repository{Clocker: c}
+	db, cleanup, err := repository.New(ctx, cfg)
+	if err != nil {
+		return nil, cleanup, err
+	}
+	c := clock.RealClocker{}
+	r := &repository.Repository{Clocker: c}
 
-	// {
-	// 	v := validator.New()
-	// 	at := &handler.AddTask{
-	// 		Service: &service.AddTask{
-	// 			DB:   db,
-	// 			Repo: r,
-	// 		},
-	// 		Validator: v,
-	// 	}
-	// 	lt := &handler.ListTask{
-	// 		Service: &service.ListTasks{
-	// 			DB:   db,
-	// 			Repo: r,
-	// 		},
-	// 	}
-	// 	mux.Route("/tasks", func(r chi.Router) {
-	// 		r.Use(handler.AuthMiddleware(jwter))
-	// 		r.Post("/", at.ServeHTTP)
-	// 		r.Get("/", lt.ServeHTTP)
-	// 	})
-	// }
+	{
+		v := validator.New()
+		cu := &handler.CreateUser{
+			Service: &service.CreateUser{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: v,
+		}
+		mux.Route("/user", func(r chi.Router) {
+			r.Post("/create", cu.ServeHTTP)
+		})
+	}
 
 	return mux, cleanup, nil
 }

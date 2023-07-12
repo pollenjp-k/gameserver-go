@@ -9,7 +9,7 @@ type Config struct {
 	DBHost     string `env:"DB_HOST" envDefault:"127.0.0.1"`
 	DBPort     int    `env:"DB_PORT" envDefault:"3306"`
 	DBUser     string `env:"DB_USER" envDefault:"webapp"`
-	DBPassword string `env:"DB_PASSWORD" envDefault:"webapp"`
+	DBPassword string `env:"DB_PASSWORD" envDefault:"webapp_no_password"`
 	DBName     string `env:"DB_NAME" envDefault:"webapp"`
 }
 
