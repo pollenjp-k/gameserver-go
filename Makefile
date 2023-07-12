@@ -32,6 +32,10 @@ db-clean:
 generate: ## Generate codes
 	go generate ./...
 
+.PHONY: test
+test: ## Execute tests
+	go test -race -shuffle=on ./...
+
 .PHONY: clean
 clean:
 	${MAKE} db-clean

@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -43,10 +42,10 @@ func (ru *CreateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := ru.Validator.Struct(body); err != nil {
 		RespondJson(ctx, w, &ErrResponse{
 			Message: err.Error(),
-			Details: []string{
-				"failed to validate request body",
-				fmt.Sprintf("%+v", body),
-			},
+			// Details: []string{
+			// 	"failed to validate request body",
+			// 	fmt.Sprintf("%+v", body),
+			// },
 		}, http.StatusBadRequest)
 		return
 	}
