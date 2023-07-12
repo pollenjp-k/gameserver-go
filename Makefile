@@ -29,6 +29,9 @@ db-clean:
 	${MAKE} db-down
 # when you create docker volume, you need to delete it and add the command.
 
+generate: ## Generate codes
+	go generate ./...
+
 .PHONY: clean
 clean:
 	${MAKE} db-clean

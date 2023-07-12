@@ -10,6 +10,7 @@ import (
 	"github.com/pollenjp/gameserver-go/api/entity"
 )
 
+//go:generate go run github.com/matryer/moq -out create_user_moq_test.go . CreateUserService
 type CreateUserService interface {
 	CreateUser(
 		ctx context.Context,
