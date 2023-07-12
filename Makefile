@@ -1,6 +1,6 @@
 ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 PROJECT_NAME := $(shell basename "${ROOT}")
-COMPOSE_FILE := _docker/docker-compose.yml
+COMPOSE_FILE := _tools/docker-compose.yml
 COMPOSE_ARGS := -f "${COMPOSE_FILE}" -p "${PROJECT_NAME}"
 
 .PHONY: run

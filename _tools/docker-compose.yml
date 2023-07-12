@@ -10,6 +10,7 @@ services:
       MYSQL_PASSWORD: webapp_no_password
       TZ: Asia/Tokyo
     volumes:
-      - ./_initdb.d:/docker-entrypoint-initdb.d
+      - ./mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./mysql/conf.d:/etc/mysql/conf.d:cached
     ports:
       - "3306:3306"
