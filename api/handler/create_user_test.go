@@ -49,7 +49,7 @@ func TestRegisterUser(t *testing.T) {
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest(
 				http.MethodPost,
-				"/tasks",
+				"/user/create",
 				bytes.NewReader(testutil.LoadFile(t, tt.reqFile)),
 			)
 
