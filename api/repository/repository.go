@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -39,12 +40,37 @@ func New(ctx context.Context, cfg *config.Config) (*sqlx.DB, func(), error) {
 	if err != nil {
 		return nil, func() {}, err
 	}
-	// Openは実際に接続テストが行われない。
-	ctx, cancel := context.WithTimeout(ctx, 2*time.Second)
-	defer cancel()
-	if err := db.PingContext(ctx); err != nil {
-		return nil, func() { _ = db.Close() }, err
+	// Open は実際に接続テストが行われない。
+	pingDB := func(trial int) error {
+		ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+		defer cancel()
+		if err := db.PingContext(ctx); err != nil {
+			time.Sleep(1 * time.Second)
+			return err
+		}
+		if err := db.PingContext(ctx); err != nil {
+			log.Printf("DB Connection (%d): %s", trial, err.Error())
+			return err
+		}
+		return nil
 	}
+
+	trial := 0
+	for {
+		trial++
+		if err := pingDB(trial); err != nil {
+			if trial > 30 {
+				log.Println("Couldn't connect to database.")
+				return nil, func() { _ = db.Close() }, err
+			}
+			time.Sleep(1 * time.Second)
+			continue
+		}
+
+		log.Printf("Database is up. Starting server...")
+		break
+	}
+
 	xdb := sqlx.NewDb(db, "mysql")
 	return xdb, func() { _ = db.Close() }, nil
 }

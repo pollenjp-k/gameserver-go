@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+  app:
+    image: gameserver-go
+    build:
+      args:
+        - target=dev
+    environment:
+      PORT: 8080
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: webapp
+      DB_PASSWORD: webapp_no_password
+      DB_DATABASE: webapp
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root_no_password
+      MYSQL_DATABASE: webapp
+      MYSQL_USER: webapp
+      MYSQL_PASSWORD: webapp_no_password
+      TZ: Asia/Tokyo
+    volumes:
+      - ./_tools/mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./_tools/mysql/conf.d:/etc/mysql/conf.d:cached
+    ports:
+      - "3306:3306"
