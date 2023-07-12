@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root_no_password
+      MYSQL_DATABASE: webapp
+      MYSQL_USER: webapp
+      MYSQL_PASSWORD: webapp_no_password
+      TZ: Asia/Tokyo
+    volumes:
+      - ./mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./mysql/conf.d:/etc/mysql/conf.d:cached
+    ports:
+      - "3306:3306"
