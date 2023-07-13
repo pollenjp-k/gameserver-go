@@ -7,7 +7,7 @@ import (
 )
 
 // DB内のユーザ情報を取得
-func (r *Repository) GetUser(
+func (r *Repository) GetUserFromId(
 	ctx context.Context, db Queryer, userId entity.UserID,
 ) (*entity.User, error) {
 	u := &entity.User{}
@@ -23,6 +23,30 @@ func (r *Repository) GetUser(
 		WHERE id = ?
 	`
 	if err := db.GetContext(ctx, u, sql, userId); err != nil {
+		return nil, err
+	}
+	if err := u.ValidateNotEmpty(); err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+// DB内のユーザ情報を取得
+func (r *Repository) GetUserFromToken(
+	ctx context.Context, db Queryer, userToken entity.UserTokenType,
+) (*entity.User, error) {
+	u := &entity.User{}
+	sql := `SELECT
+			id,
+			name,
+			token,
+			leader_card_id,
+			created_at,
+			updated_at
+		FROM user
+		WHERE token = ?
+	`
+	if err := db.GetContext(ctx, u, sql, userToken); err != nil {
 		return nil, err
 	}
 	if err := u.ValidateNotEmpty(); err != nil {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
+	"github.com/pollenjp/gameserver-go/api/auth"
 	"github.com/pollenjp/gameserver-go/api/clock"
 	"github.com/pollenjp/gameserver-go/api/config"
 	"github.com/pollenjp/gameserver-go/api/handler"
@@ -34,6 +35,7 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 	}
 	c := clock.RealClocker{}
 	r := &repository.Repository{Clocker: c}
+	au := auth.NewAuthorizer(db, r)
 
 	{
 		v := validator.New()
@@ -44,8 +46,16 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 			},
 			Validator: v,
 		}
+		me := &handler.UserMe{
+			Service: &service.GetUser{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
 		mux.Route("/user", func(r chi.Router) {
 			r.Post("/create", cu.ServeHTTP)
+			r.Get("/me", handler.AuthMiddleware(au)(me).ServeHTTP)
 		})
 	}
 

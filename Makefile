@@ -1,44 +1,43 @@
 ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 PROJECT_NAME := $(shell basename "${ROOT}")
-COMPOSE_FILE := _tools/docker-compose.yml
+COMPOSE_FILE := docker-compose.yml
 COMPOSE_ARGS := -f "${COMPOSE_FILE}" -p "${PROJECT_NAME}"
 
 .PHONY: run
 run:
 	go run .
 
-.PHONY: db-up
-db-up: ## Run docker compose up in the background
-	docker compose ${COMPOSE_ARGS} up -d db
+.PHONY: up
+up: ## Run docker compose up in the background
+	docker compose ${COMPOSE_ARGS} up -d
 
-PHNEY: db-down
-db-down: ## Run docker compose down
+PHNEY: down
+down: ## Run docker compose down
 	docker compose ${COMPOSE_ARGS} down
 
-.PHONY: db-logs
-db-logs: ## Tail docker compose logs
-	docker compose ${COMPOSE_ARGS} logs -f db
+.PHONY: logs
+logs: ## Tail docker compose logs
+	docker compose ${COMPOSE_ARGS} logs -f
 
 .PHONY: db-exec
 db-exec:
 	docker compose ${COMPOSE_ARGS} exec db bash -c \
 	'mysql -u webapp --password=webapp_no_password'
 
-.PHONY: db-clean
-db-clean:
-	${MAKE} db-down
-# when you create docker volume, you need to delete it and add the command.
-
 generate: ## Generate codes
 	go generate ./...
 
 .PHONY: test
 test: ## Execute tests
-	go test -race -shuffle=on ./...
+	go test -v -race -shuffle=on ./...
+
+.PHONY: lint
+lint:
+	golangci-lint run --config=./.golangci.yml ./...
 
 .PHONY: clean
 clean:
-	${MAKE} db-clean
+	${MAKE} down
 
 help: ## Show options
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \

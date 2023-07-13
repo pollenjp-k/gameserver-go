@@ -10,26 +10,26 @@ import (
 	"sync"
 )
 
-// Ensure, that UserRegistrarMock does implement UserRegistrar.
+// Ensure, that CreateUserRepositoryMock does implement CreateUserRepository.
 // If this is not the case, regenerate this file with moq.
-var _ UserRegistrar = &UserRegistrarMock{}
+var _ CreateUserRepository = &CreateUserRepositoryMock{}
 
-// UserRegistrarMock is a mock implementation of UserRegistrar.
+// CreateUserRepositoryMock is a mock implementation of CreateUserRepository.
 //
-//	func TestSomethingThatUsesUserRegistrar(t *testing.T) {
+//	func TestSomethingThatUsesCreateUserRepository(t *testing.T) {
 //
-//		// make and configure a mocked UserRegistrar
-//		mockedUserRegistrar := &UserRegistrarMock{
+//		// make and configure a mocked CreateUserRepository
+//		mockedCreateUserRepository := &CreateUserRepositoryMock{
 //			CreateUserFunc: func(ctx context.Context, db repository.Execer, u *entity.User) error {
 //				panic("mock out the CreateUser method")
 //			},
 //		}
 //
-//		// use mockedUserRegistrar in code that requires UserRegistrar
+//		// use mockedCreateUserRepository in code that requires CreateUserRepository
 //		// and then make assertions.
 //
 //	}
-type UserRegistrarMock struct {
+type CreateUserRepositoryMock struct {
 	// CreateUserFunc mocks the CreateUser method.
 	CreateUserFunc func(ctx context.Context, db repository.Execer, u *entity.User) error
 
@@ -49,9 +49,9 @@ type UserRegistrarMock struct {
 }
 
 // CreateUser calls CreateUserFunc.
-func (mock *UserRegistrarMock) CreateUser(ctx context.Context, db repository.Execer, u *entity.User) error {
+func (mock *CreateUserRepositoryMock) CreateUser(ctx context.Context, db repository.Execer, u *entity.User) error {
 	if mock.CreateUserFunc == nil {
-		panic("UserRegistrarMock.CreateUserFunc: method is nil but UserRegistrar.CreateUser was just called")
+		panic("CreateUserRepositoryMock.CreateUserFunc: method is nil but CreateUserRepository.CreateUser was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
@@ -71,8 +71,8 @@ func (mock *UserRegistrarMock) CreateUser(ctx context.Context, db repository.Exe
 // CreateUserCalls gets all the calls that were made to CreateUser.
 // Check the length with:
 //
-//	len(mockedUserRegistrar.CreateUserCalls())
-func (mock *UserRegistrarMock) CreateUserCalls() []struct {
+//	len(mockedCreateUserRepository.CreateUserCalls())
+func (mock *CreateUserRepositoryMock) CreateUserCalls() []struct {
 	Ctx context.Context
 	Db  repository.Execer
 	U   *entity.User

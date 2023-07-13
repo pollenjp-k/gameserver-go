@@ -37,10 +37,10 @@ func run(ctx context.Context) error {
 	// run server
 
 	mux, cleanup, err := api.NewMux(ctx, cfg)
+	defer cleanup()
 	if err != nil {
 		return err
 	}
-	defer cleanup()
 
 	s := api.NewServer(l, mux)
 	return s.Run(ctx)
