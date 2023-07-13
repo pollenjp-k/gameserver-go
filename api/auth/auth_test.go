@@ -65,9 +65,8 @@ func TestAuthorizer(t *testing.T) {
 				"/dummy",
 				nil,
 			)
-			for k, v := range tt.header {
-				r.Header.Add(k, v[0])
-			}
+			key := "Authorization"
+			r.Header.Add(key, tt.header.Get(key))
 
 			dummyUser := &entity.User{
 				Id:           1,
@@ -105,12 +104,6 @@ func TestAuthorizer(t *testing.T) {
 			var err error
 			r, err = sut.FillContext(r)
 			if err != nil {
-				if tt.isOk {
-					// ok のはずなのに失敗している
-					t.Errorf("unexpected error: %s", err)
-					return
-				}
-
 				if diff := cmp.Diff(err.Error(), tt.want.errMsg); diff != "" {
 					t.Errorf("error is not match (-want +got)\n%s", diff)
 				}

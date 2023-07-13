@@ -31,6 +31,10 @@ generate: ## Generate codes
 test: ## Execute tests
 	go test -v -race -shuffle=on ./...
 
+.PHONY: lint
+lint:
+	golangci-lint run --config=./.golangci.yml ./...
+
 .PHONY: clean
 clean:
 	${MAKE} down
