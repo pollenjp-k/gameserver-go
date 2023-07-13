@@ -53,9 +53,17 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 			},
 			Validator: validator.New(),
 		}
+		uu := &handler.UpdateUser{
+			Service: &service.UpdateUser{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
 		mux.Route("/user", func(r chi.Router) {
 			r.Post("/create", cu.ServeHTTP)
 			r.Get("/me", handler.AuthMiddleware(au)(me).ServeHTTP)
+			r.Post("/update", handler.AuthMiddleware(au)(uu).ServeHTTP)
 		})
 	}
 
