@@ -59,7 +59,7 @@ func TestUserMe(t *testing.T) {
 			moq := &GetUserServiceMock{}
 			moq.GetUserFunc = func(
 				ctx context.Context,
-				userId entity.UserID,
+				userId entity.UserId,
 			) (*entity.User, error) {
 				if tt.want.status == http.StatusOK {
 					u := dummyUser

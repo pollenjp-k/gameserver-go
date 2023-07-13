@@ -8,7 +8,7 @@ import (
 
 // DB内のユーザ情報を取得
 func (r *Repository) GetUserFromId(
-	ctx context.Context, db Queryer, userId entity.UserID,
+	ctx context.Context, db Queryer, userId entity.UserId,
 ) (*entity.User, error) {
 	u := &entity.User{}
 	sql := `

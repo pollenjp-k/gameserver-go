@@ -30,7 +30,7 @@ var _ GetUserService = &GetUserServiceMock{}
 //	}
 type GetUserServiceMock struct {
 	// GetUserFunc mocks the GetUser method.
-	GetUserFunc func(ctx context.Context, userId entity.UserID) (*entity.User, error)
+	GetUserFunc func(ctx context.Context, userId entity.UserId) (*entity.User, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -39,20 +39,20 @@ type GetUserServiceMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// UserId is the userId argument value.
-			UserId entity.UserID
+			UserId entity.UserId
 		}
 	}
 	lockGetUser sync.RWMutex
 }
 
 // GetUser calls GetUserFunc.
-func (mock *GetUserServiceMock) GetUser(ctx context.Context, userId entity.UserID) (*entity.User, error) {
+func (mock *GetUserServiceMock) GetUser(ctx context.Context, userId entity.UserId) (*entity.User, error) {
 	if mock.GetUserFunc == nil {
 		panic("GetUserServiceMock.GetUserFunc: method is nil but GetUserService.GetUser was just called")
 	}
 	callInfo := struct {
 		Ctx    context.Context
-		UserId entity.UserID
+		UserId entity.UserId
 	}{
 		Ctx:    ctx,
 		UserId: userId,
@@ -69,11 +69,11 @@ func (mock *GetUserServiceMock) GetUser(ctx context.Context, userId entity.UserI
 //	len(mockedGetUserService.GetUserCalls())
 func (mock *GetUserServiceMock) GetUserCalls() []struct {
 	Ctx    context.Context
-	UserId entity.UserID
+	UserId entity.UserId
 } {
 	var calls []struct {
 		Ctx    context.Context
-		UserId entity.UserID
+		UserId entity.UserId
 	}
 	mock.lockGetUser.RLock()
 	calls = mock.calls.GetUser

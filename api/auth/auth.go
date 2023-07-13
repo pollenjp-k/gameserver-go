@@ -45,11 +45,11 @@ func (au *Authorizer) FillContext(r *http.Request) (*http.Request, error) {
 	return clone, nil
 }
 
-func SetUserId(ctx context.Context, uid entity.UserID) context.Context {
+func SetUserId(ctx context.Context, uid entity.UserId) context.Context {
 	return context.WithValue(ctx, userIDKey{}, uid)
 }
 
-func GetUserId(ctx context.Context) (entity.UserID, bool) {
-	id, ok := ctx.Value(userIDKey{}).(entity.UserID)
+func GetUserId(ctx context.Context) (entity.UserId, bool) {
+	id, ok := ctx.Value(userIDKey{}).(entity.UserId)
 	return id, ok
 }

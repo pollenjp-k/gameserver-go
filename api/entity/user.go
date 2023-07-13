@@ -5,12 +5,12 @@ import (
 	"time"
 )
 
-type UserID int64
+type UserId int64
 type LeaderCardIdIDType int64
 type UserTokenType string
 
 type User struct {
-	Id           UserID             `db:"id"`
+	Id           UserId             `db:"id"`
 	Name         string             `db:"name"`
 	Token        UserTokenType      `db:"token"`
 	LeaderCardId LeaderCardIdIDType `db:"leader_card_id"`

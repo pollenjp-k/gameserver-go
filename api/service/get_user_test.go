@@ -47,7 +47,7 @@ func TestGetUser(t *testing.T) {
 			moq.GetUserFromIdFunc = func(
 				_ context.Context,
 				_ repository.Queryer,
-				_ entity.UserID,
+				_ entity.UserId,
 			) (*entity.User, error) {
 				u := dummyUser
 				if err := u.ValidateNotEmpty(); err != nil {

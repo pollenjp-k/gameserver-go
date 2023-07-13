@@ -63,7 +63,7 @@ func (r *Repository) CreateUser(
 		return err
 	}
 
-	u.Id = entity.UserID(id)
+	u.Id = entity.UserId(id)
 	if err := u.ValidateNotEmpty(); err != nil {
 		return err
 	}

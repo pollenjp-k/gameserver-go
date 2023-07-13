@@ -9,7 +9,7 @@ import (
 
 //go:generate go run github.com/matryer/moq -out get_user_moq_test.go . UserGetter
 type UserGetter interface {
-	GetUserFromId(ctx context.Context, db repository.Queryer, userId entity.UserID) (*entity.User, error)
+	GetUserFromId(ctx context.Context, db repository.Queryer, userId entity.UserId) (*entity.User, error)
 }
 
 type GetUser struct {
@@ -19,7 +19,7 @@ type GetUser struct {
 
 func (ru *GetUser) GetUser(
 	ctx context.Context,
-	userId entity.UserID,
+	userId entity.UserId,
 ) (*entity.User, error) {
 	u, err := ru.Repo.GetUserFromId(ctx, ru.DB, userId)
 	if err != nil {

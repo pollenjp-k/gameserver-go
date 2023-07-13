@@ -31,7 +31,7 @@ var _ UserGetter = &UserGetterMock{}
 //	}
 type UserGetterMock struct {
 	// GetUserFromIdFunc mocks the GetUserFromId method.
-	GetUserFromIdFunc func(ctx context.Context, db repository.Queryer, userId entity.UserID) (*entity.User, error)
+	GetUserFromIdFunc func(ctx context.Context, db repository.Queryer, userId entity.UserId) (*entity.User, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -42,21 +42,21 @@ type UserGetterMock struct {
 			// Db is the db argument value.
 			Db repository.Queryer
 			// UserId is the userId argument value.
-			UserId entity.UserID
+			UserId entity.UserId
 		}
 	}
 	lockGetUserFromId sync.RWMutex
 }
 
 // GetUserFromId calls GetUserFromIdFunc.
-func (mock *UserGetterMock) GetUserFromId(ctx context.Context, db repository.Queryer, userId entity.UserID) (*entity.User, error) {
+func (mock *UserGetterMock) GetUserFromId(ctx context.Context, db repository.Queryer, userId entity.UserId) (*entity.User, error) {
 	if mock.GetUserFromIdFunc == nil {
 		panic("UserGetterMock.GetUserFromIdFunc: method is nil but UserGetter.GetUserFromId was just called")
 	}
 	callInfo := struct {
 		Ctx    context.Context
 		Db     repository.Queryer
-		UserId entity.UserID
+		UserId entity.UserId
 	}{
 		Ctx:    ctx,
 		Db:     db,
@@ -75,12 +75,12 @@ func (mock *UserGetterMock) GetUserFromId(ctx context.Context, db repository.Que
 func (mock *UserGetterMock) GetUserFromIdCalls() []struct {
 	Ctx    context.Context
 	Db     repository.Queryer
-	UserId entity.UserID
+	UserId entity.UserId
 } {
 	var calls []struct {
 		Ctx    context.Context
 		Db     repository.Queryer
-		UserId entity.UserID
+		UserId entity.UserId
 	}
 	mock.lockGetUserFromId.RLock()
 	calls = mock.calls.GetUserFromId

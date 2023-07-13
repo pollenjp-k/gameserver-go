@@ -14,7 +14,7 @@ import (
 type GetUserService interface {
 	GetUser(
 		ctx context.Context,
-		userId entity.UserID,
+		userId entity.UserId,
 	) (*entity.User, error)
 }
 
@@ -42,7 +42,7 @@ func (ru *UserMe) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rsp := struct {
-		Id           entity.UserID             `json:"id"`
+		Id           entity.UserId             `json:"id"`
 		Name         string                    `json:"name"`
 		LeaderCardId entity.LeaderCardIdIDType `json:"leader_card_id"`
 	}{
