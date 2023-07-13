@@ -14,11 +14,6 @@ import (
 func TestGetUser(t *testing.T) {
 	t.Parallel()
 
-	type want struct {
-		status  int
-		rspFile string
-	}
-
 	tests := map[string]struct {
 		isErr  bool
 		errMsg string
