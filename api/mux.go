@@ -90,11 +90,19 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 			},
 			Validator: validator.New(),
 		}
+		wr := &room.WaitRoom{
+			Service: &service.WaitRoom{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
 		mux.Route("/room", func(r chi.Router) {
 			r.Use(handler.AuthMiddleware(au))
 			r.Post("/create", cr.ServeHTTP)
 			r.Post("/list", rl.ServeHTTP)
 			r.Post("/join", jr.ServeHTTP)
+			r.Post("/wait", wr.ServeHTTP)
 		})
 	}
 
