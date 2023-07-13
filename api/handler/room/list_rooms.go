@@ -59,16 +59,16 @@ func (ru *GetRoomList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	type roomInfoItem struct {
+	type item struct {
 		RoomId          entity.RoomId `json:"room_id"`
 		LiveId          entity.LiveId `json:"live_id"`
 		JoinedUserCount int           `json:"joined_user_count"`
 		MaxUserCount    int           `json:"max_user_count"`
 	}
 
-	roomInfoList := make([]*roomInfoItem, len(rooms))
+	roomInfoList := make([]*item, len(rooms))
 	for i, roomInfo := range rooms {
-		roomInfoList[i] = &roomInfoItem{
+		roomInfoList[i] = &item{
 			RoomId:          roomInfo.RoomId,
 			LiveId:          roomInfo.LiveId,
 			JoinedUserCount: roomInfo.JoinedUserCount,
@@ -77,7 +77,7 @@ func (ru *GetRoomList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rsp := struct {
-		RoomInfoList []*roomInfoItem `json:"room_info_list"`
+		RoomInfoList []*item `json:"room_info_list"`
 	}{
 		RoomInfoList: roomInfoList,
 	}
