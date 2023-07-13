@@ -12,14 +12,14 @@ CREATE TABLE `user` (
 ) Engine=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='ユーザー';
 
 CREATE TABLE `room` (
-  `room_id` bigint NOT NULL AUTO_INCREMENT,
+  `id` bigint NOT NULL AUTO_INCREMENT,
   -- 楽曲ID
   `live_id` bigint NOT NULL,
   `host_user_id` bigint NOT NULL,
   `status` int NOT NULL DEFAULT 1,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`room_id`)
+  PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `room_user` (
