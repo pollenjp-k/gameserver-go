@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/pollenjp/gameserver-go/api/entity"
 	"github.com/pollenjp/gameserver-go/api/repository"
 )
@@ -36,28 +37,30 @@ func (cr *CreateRoom) CreateRoom(
 	hostUserId entity.UserId,
 ) (*entity.Room, *entity.RoomUser, error) {
 	// helper functions
-	fail := func(err error) (*entity.Room, *entity.RoomUser, error) {
-		return nil, nil, fmt.Errorf("failed to register: %w", err)
+	failWithRollBack := func(tx *sqlx.Tx, err error) (*entity.Room, *entity.RoomUser, error) {
+		if rollbackErr := tx.Rollback(); rollbackErr != nil {
+			err = fmt.Errorf("rollbacking: %w: %v", rollbackErr, err)
+		}
+		return nil, nil, err
 	}
 
 	tx, err := cr.DB.BeginTxx(ctx, nil)
 	if err != nil {
-		return fail(fmt.Errorf("BeginTxx: %w", err))
+		return nil, nil, fmt.Errorf("BeginTxx: %w", err)
 	}
-	defer tx.Rollback()
 
 	room, err := cr.Repo.CreateRoom(ctx, tx, liveId, hostUserId)
 	if err != nil {
-		return fail(fmt.Errorf("CreateRoom: %w", err))
+		return failWithRollBack(tx, fmt.Errorf("CreateRoom: %w", err))
 	}
 
 	roomUser, err := cr.Repo.CreateRoomUser(ctx, tx, room.Id, hostUserId, entity.LiveDifficultyNormal)
 	if err != nil {
-		return fail(fmt.Errorf("CreateRoomUser: %w", err))
+		return failWithRollBack(tx, fmt.Errorf("CreateRoomUser: %w", err))
 	}
 
 	if err := tx.Commit(); err != nil {
-		return fail(fmt.Errorf("commit: %w", err))
+		return failWithRollBack(tx, fmt.Errorf("committing: %w", err))
 	}
 
 	return room, roomUser, nil
