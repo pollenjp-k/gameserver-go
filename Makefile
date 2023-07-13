@@ -29,7 +29,7 @@ generate: ## Generate codes
 
 .PHONY: test
 test: ## Execute tests
-	go test -race -shuffle=on ./...
+	go test -v -race -shuffle=on ./...
 
 .PHONY: clean
 clean:

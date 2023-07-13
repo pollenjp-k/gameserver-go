@@ -35,7 +35,7 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 	}
 	c := clock.RealClocker{}
 	r := &repository.Repository{Clocker: c}
-	au := auth.NewAuthenticator(db, r)
+	au := auth.NewAuthorizer(db, r)
 
 	{
 		v := validator.New()

@@ -13,14 +13,14 @@ type AuthRepository interface {
 	GetUserFromToken(ctx context.Context, db repository.Queryer, userToken entity.UserTokenType) (*entity.User, error)
 }
 
-func NewAuthenticator(db repository.Queryer, repo AuthRepository) *Authenticator {
-	return &Authenticator{
+func NewAuthorizer(db repository.Queryer, repo AuthRepository) *Authorizer {
+	return &Authorizer{
 		DB:   db,
 		Repo: repo,
 	}
 }
 
-type Authenticator struct {
+type Authorizer struct {
 	DB   repository.Queryer
 	Repo AuthRepository
 }
@@ -28,7 +28,7 @@ type Authenticator struct {
 type userIDKey struct{}
 
 // *http.Request型から認証情報を context に書き込む
-func (au *Authenticator) FillContext(r *http.Request) (*http.Request, error) {
+func (au *Authorizer) FillContext(r *http.Request) (*http.Request, error) {
 	token, err := ExtractBearerToken(r)
 	if err != nil {
 		return nil, err

@@ -6,7 +6,7 @@ import (
 	"github.com/pollenjp/gameserver-go/api/auth"
 )
 
-func AuthMiddleware(au *auth.Authenticator) func(next http.Handler) http.Handler {
+func AuthMiddleware(au *auth.Authorizer) func(next http.Handler) http.Handler {
 	// request の context に認証情報を埋め込む
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
