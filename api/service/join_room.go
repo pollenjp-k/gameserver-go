@@ -103,7 +103,7 @@ func (cr *JoinRoom) JoinRoom(
 	}
 
 	if _, err := cr.Repo.CreateRoomUser(ctx, tx, room.Id, userId, liveDifficulty); err != nil {
-		return failWithRollBack(tx, fmt.Errorf("CreateRoomUser: %w", err))
+		return failWithRollBack(tx, err)
 	}
 
 	if err := tx.Commit(); err != nil {
