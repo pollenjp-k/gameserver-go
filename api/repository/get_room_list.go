@@ -12,7 +12,6 @@ func (r *Repository) GetRoomList(
 	db service.Queryer,
 	liveId entity.LiveId,
 ) ([]*service.RoomInfoItem, error) {
-
 	roomList := []*service.RoomInfoItem{}
 
 	sql := `
