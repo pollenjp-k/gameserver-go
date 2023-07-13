@@ -56,9 +56,9 @@ func TestRegisterUser(t *testing.T) {
 			// auto generated moq
 			moq := &CreateUserServiceMock{}
 			moq.CreateUserFunc = func(
-				ctx context.Context,
-				name string,
-				leaderCard entity.LeaderCardIdIDType,
+				_ context.Context,
+				_ string,
+				_ entity.LeaderCardIdIDType,
 			) (*entity.User, error) {
 				if tt.want.status == http.StatusOK {
 					return &entity.User{
