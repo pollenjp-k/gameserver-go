@@ -10,6 +10,7 @@ import (
 	"github.com/pollenjp/gameserver-go/api/clock"
 	"github.com/pollenjp/gameserver-go/api/config"
 	"github.com/pollenjp/gameserver-go/api/handler"
+	"github.com/pollenjp/gameserver-go/api/handler/room"
 	"github.com/pollenjp/gameserver-go/api/handler/user"
 	"github.com/pollenjp/gameserver-go/api/repository"
 	"github.com/pollenjp/gameserver-go/api/service"
@@ -39,13 +40,12 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 	au := auth.NewAuthorizer(db, r)
 
 	{
-		v := validator.New()
 		cu := &user.CreateUser{
 			Service: &service.CreateUser{
 				DB:   db,
 				Repo: r,
 			},
-			Validator: v,
+			Validator: validator.New(),
 		}
 		me := &user.UserMe{
 			Service: &service.GetUser{
@@ -65,6 +65,21 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 			r.Post("/create", cu.ServeHTTP)
 			r.Get("/me", handler.AuthMiddleware(au)(me).ServeHTTP)
 			r.Post("/update", handler.AuthMiddleware(au)(uu).ServeHTTP)
+		})
+	}
+
+	{
+		cr := &room.CreateRoom{
+			Service: &service.CreateRoom{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
+
+		mux.Route("/room", func(r chi.Router) {
+			r.Use(handler.AuthMiddleware(au))
+			r.Post("/create", cr.ServeHTTP)
 		})
 	}
 

@@ -105,7 +105,8 @@ type Repository struct {
 }
 
 type Beginner interface {
-	BeginTx(ctx context.Context, opts *sql.TxOptions) (*sql.Tx, error)
+	// https://pkg.go.dev/github.com/jmoiron/sqlx#DB.BeginTxx
+	BeginTxx(ctx context.Context, opts *sql.TxOptions) (*sqlx.Tx, error)
 }
 
 type Preparer interface {
