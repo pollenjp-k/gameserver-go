@@ -1,6 +1,7 @@
-package handler
+package user
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"net/http"
@@ -8,14 +9,11 @@ import (
 	"testing"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/google/uuid"
-	"github.com/pollenjp/gameserver-go/api/auth"
-	"github.com/pollenjp/gameserver-go/api/clock"
 	"github.com/pollenjp/gameserver-go/api/entity"
 	"github.com/pollenjp/gameserver-go/api/testutil"
 )
 
-func TestUserMe(t *testing.T) {
+func TestRegisterUser(t *testing.T) {
 	t.Parallel()
 
 	type want struct {
@@ -24,58 +22,53 @@ func TestUserMe(t *testing.T) {
 	}
 
 	tests := map[string]struct {
-		want want
+		reqFile string
+		want    want
 	}{
 		"ok": {
+			reqFile: "testdata/create_user/ok/req.json.golden",
 			want: want{
 				status:  200, // http.StatusOK
-				rspFile: "testdata/user_me/ok/res.json.golden",
+				rspFile: "testdata/create_user/ok/res.json.golden",
+			},
+		},
+		"bad_empty_username": {
+			reqFile: "testdata/create_user/bad_empty_username/req.json.golden",
+			want: want{
+				status:  400, // http.StatusBadRequest
+				rspFile: "testdata/create_user/bad_empty_username/res.json.golden",
 			},
 		},
 	}
 
 	for n, tt := range tests {
 		tt := tt
-		c := clock.FixedClocker{}
 		t.Run(n, func(t *testing.T) {
 			t.Parallel()
 
 			w := httptest.NewRecorder()
 			r := httptest.NewRequest(
 				http.MethodPost,
-				"/user/me",
-				nil,
+				"/user/create",
+				bytes.NewReader(testutil.LoadFile(t, tt.reqFile)),
 			)
 
-			dummyUser := &entity.User{
-				Id:           1,
-				Name:         "test",
-				Token:        entity.UserTokenType(uuid.NewString()),
-				LeaderCardId: 0,
-				CreatedAt:    c.Now(),
-				UpdatedAt:    c.Now(),
-			}
-
-			moq := &GetUserServiceMock{}
-			moq.GetUserFunc = func(
+			// auto generated moq
+			moq := &CreateUserServiceMock{}
+			moq.CreateUserFunc = func(
 				ctx context.Context,
-				userId entity.UserID,
+				name string,
+				leaderCard entity.LeaderCardIdIDType,
 			) (*entity.User, error) {
 				if tt.want.status == http.StatusOK {
-					u := dummyUser
-					if err := u.ValidateNotEmpty(); err != nil {
-						return nil, err
-					}
-					return u, nil
+					return &entity.User{
+						Id:    1,
+						Token: "7e13ae4f-bd7f-4c2a-ad90-8c2c7bf6f425",
+					}, nil
 				}
 				return nil, errors.New("error from mock")
 			}
-
-			// 認証情報の追加
-			ctx := auth.SetUserId(r.Context(), dummyUser.Id)
-			r = r.Clone(ctx)
-
-			sut := UserMe{
+			sut := CreateUser{
 				Service:   moq,
 				Validator: validator.New(),
 			}

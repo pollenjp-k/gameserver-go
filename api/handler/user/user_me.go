@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/pollenjp/gameserver-go/api/auth"
 	"github.com/pollenjp/gameserver-go/api/entity"
+	"github.com/pollenjp/gameserver-go/api/handler"
 )
 
 //go:generate go run github.com/matryer/moq -out usre_me_moq_test.go . GetUserService
@@ -26,7 +27,7 @@ func (ru *UserMe) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userId, isOk := auth.GetUserId(ctx)
 	if !isOk {
-		RespondJson(ctx, w, &ErrResponse{
+		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: "failed to get user id from token",
 		}, http.StatusInternalServerError)
 		return
@@ -34,7 +35,7 @@ func (ru *UserMe) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	u, err := ru.Service.GetUser(ctx, userId)
 	if err != nil {
-		RespondJson(ctx, w, &ErrResponse{
+		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: err.Error(),
 		}, http.StatusInternalServerError)
 		return
@@ -49,5 +50,5 @@ func (ru *UserMe) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Name:         u.Name,
 		LeaderCardId: u.LeaderCardId,
 	}
-	RespondJson(ctx, w, rsp, http.StatusOK)
+	handler.RespondJson(ctx, w, rsp, http.StatusOK)
 }

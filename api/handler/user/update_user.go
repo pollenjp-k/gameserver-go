@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/pollenjp/gameserver-go/api/auth"
 	"github.com/pollenjp/gameserver-go/api/entity"
+	"github.com/pollenjp/gameserver-go/api/handler"
 )
 
 //go:generate go run github.com/matryer/moq -out usre_me_moq_test.go . UpdateUserService
@@ -27,7 +28,7 @@ func (ru *UpdateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userId, isOk := auth.GetUserId(ctx)
 	if !isOk {
-		RespondJson(ctx, w, &ErrResponse{
+		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: "failed to get user id from token",
 		}, http.StatusInternalServerError)
 		return
@@ -39,14 +40,14 @@ func (ru *UpdateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		RespondJson(ctx, w, &ErrResponse{
+		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: err.Error(),
 		}, http.StatusInternalServerError)
 		return
 	}
 
 	if err := ru.Validator.Struct(body); err != nil {
-		RespondJson(ctx, w, &ErrResponse{
+		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: err.Error(),
 		}, http.StatusBadRequest)
 		return
@@ -58,12 +59,12 @@ func (ru *UpdateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		LeaderCardId: body.LeaderCardId,
 	})
 	if err != nil {
-		RespondJson(ctx, w, &ErrResponse{
+		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: err.Error(),
 		}, http.StatusInternalServerError)
 		return
 	}
 
 	rsp := struct{}{}
-	RespondJson(ctx, w, rsp, http.StatusOK)
+	handler.RespondJson(ctx, w, rsp, http.StatusOK)
 }

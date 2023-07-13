@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"context"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/pollenjp/gameserver-go/api/entity"
+	"github.com/pollenjp/gameserver-go/api/handler"
 )
 
 //go:generate go run github.com/matryer/moq -out create_user_moq_test.go . CreateUserService
@@ -33,14 +34,14 @@ func (ru *CreateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		RespondJson(ctx, w, &ErrResponse{
+		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: err.Error(),
 		}, http.StatusInternalServerError)
 		return
 	}
 
 	if err := ru.Validator.Struct(body); err != nil {
-		RespondJson(ctx, w, &ErrResponse{
+		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: err.Error(),
 			// Details: []string{
 			// 	"failed to validate request body",
@@ -52,7 +53,7 @@ func (ru *CreateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	u, err := ru.Service.CreateUser(ctx, body.Name, body.LeaderCardId)
 	if err != nil {
-		RespondJson(ctx, w, &ErrResponse{
+		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: err.Error(),
 		}, http.StatusInternalServerError)
 		return
@@ -63,5 +64,5 @@ func (ru *CreateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}{
 		Token: u.Token,
 	}
-	RespondJson(ctx, w, rsp, http.StatusOK)
+	handler.RespondJson(ctx, w, rsp, http.StatusOK)
 }

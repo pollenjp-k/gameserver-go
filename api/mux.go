@@ -10,6 +10,7 @@ import (
 	"github.com/pollenjp/gameserver-go/api/clock"
 	"github.com/pollenjp/gameserver-go/api/config"
 	"github.com/pollenjp/gameserver-go/api/handler"
+	"github.com/pollenjp/gameserver-go/api/handler/user"
 	"github.com/pollenjp/gameserver-go/api/repository"
 	"github.com/pollenjp/gameserver-go/api/service"
 )
@@ -39,21 +40,21 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 
 	{
 		v := validator.New()
-		cu := &handler.CreateUser{
+		cu := &user.CreateUser{
 			Service: &service.CreateUser{
 				DB:   db,
 				Repo: r,
 			},
 			Validator: v,
 		}
-		me := &handler.UserMe{
+		me := &user.UserMe{
 			Service: &service.GetUser{
 				DB:   db,
 				Repo: r,
 			},
 			Validator: validator.New(),
 		}
-		uu := &handler.UpdateUser{
+		uu := &user.UpdateUser{
 			Service: &service.UpdateUser{
 				DB:   db,
 				Repo: r,
