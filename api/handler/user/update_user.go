@@ -11,7 +11,8 @@ import (
 	"github.com/pollenjp/gameserver-go/api/handler"
 )
 
-//go:generate go run github.com/matryer/moq -out usre_me_moq_test.go . UpdateUserService
+// TODO: convert to //go:generate when writing tests
+// go:generate go run github.com/matryer/moq -out update_user_moq_test.go . UpdateUserService
 type UpdateUserService interface {
 	UpdateUser(
 		ctx context.Context,

@@ -8,7 +8,8 @@ import (
 	"github.com/pollenjp/gameserver-go/api/entity"
 )
 
-//go:generate go run github.com/matryer/moq -out create_room_moq_test.go . CreateRoomRepository
+// TODO: convert to //go:generate when writing tests
+// go:generate go run github.com/matryer/moq -out create_room_moq_test.go . CreateRoomRepository
 type CreateRoomRepository interface {
 	CreateRoom(
 		ctx context.Context,

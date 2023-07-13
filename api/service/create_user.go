@@ -7,7 +7,8 @@ import (
 	"github.com/pollenjp/gameserver-go/api/entity"
 )
 
-//go:generate go run github.com/matryer/moq -out create_user_moq_test.go . CreateUserRepository
+// TODO: convert to //go:generate when writing tests
+// go:generate go run github.com/matryer/moq -out create_user_moq_test.go . CreateUserRepository
 type CreateUserRepository interface {
 	CreateUser(ctx context.Context, db Execer, u *entity.User) error
 }
