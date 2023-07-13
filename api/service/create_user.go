@@ -8,14 +8,14 @@ import (
 	"github.com/pollenjp/gameserver-go/api/repository"
 )
 
-//go:generate go run github.com/matryer/moq -out register_user_moq_test.go . UserRegistrar
-type UserRegistrar interface {
+//go:generate go run github.com/matryer/moq -out create_user_moq_test.go . CreateUserRepository
+type CreateUserRepository interface {
 	CreateUser(ctx context.Context, db repository.Execer, u *entity.User) error
 }
 
 type CreateUser struct {
 	DB   repository.Execer
-	Repo UserRegistrar
+	Repo CreateUserRepository
 }
 
 func (ru *CreateUser) CreateUser(
