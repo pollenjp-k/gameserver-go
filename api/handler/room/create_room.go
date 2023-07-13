@@ -11,7 +11,8 @@ import (
 	"github.com/pollenjp/gameserver-go/api/handler"
 )
 
-//go:generate go run github.com/matryer/moq -out create_room_moq_test.go . CreateRoomService
+// TODO: convert to //go:generate when writing tests
+// go:generate go run github.com/matryer/moq -out create_room_moq_test.go . CreateRoomService
 type CreateRoomService interface {
 	CreateRoom(
 		ctx context.Context,
