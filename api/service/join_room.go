@@ -60,17 +60,21 @@ func (cr *JoinRoom) JoinRoom(
 
 	room, err := cr.Repo.GetRoom(ctx, tx, roomId)
 	if err != nil {
-		return failWithRollBack(tx, fmt.Errorf("CreateRoom: %w", err))
+		return failWithRollBack(tx, err)
 	}
 
 	switch room.Status {
 	case entity.RoomStatusWaiting:
 		// do nothing
 	case entity.RoomStatusLiveStart:
-		defer failWithRollBack(tx, fmt.Errorf("room is playing"))
+		if result, err := failWithRollBack(tx, nil); err != nil {
+			return result, err
+		}
 		return entity.JoinRoomResultOtherErr, nil
 	case entity.RoomStatusDissolution:
-		defer failWithRollBack(tx, fmt.Errorf("room is finished"))
+		if result, err := failWithRollBack(tx, nil); err != nil {
+			return result, err
+		}
 		return entity.JoinRoomResultDisbanded, nil
 	default:
 		return failWithRollBack(tx, fmt.Errorf("unknown room status: %v", room.Status))
@@ -79,17 +83,21 @@ func (cr *JoinRoom) JoinRoom(
 	// check the number of users in the room
 	roomUsers, err := cr.Repo.GetRoomUsers(ctx, tx, roomId)
 	if err != nil {
-		return failWithRollBack(tx, fmt.Errorf("GetRoomUsers: %w", err))
+		return failWithRollBack(tx, err)
 	}
 	if len(roomUsers) >= config.MaxUserCount {
-		defer failWithRollBack(tx, fmt.Errorf("room is full"))
+		if result, err := failWithRollBack(tx, nil); err != nil {
+			return result, err
+		}
 		return entity.JoinRoomResultRoomFull, nil
 	}
 
 	// if the user is already in the room, return the result
 	for _, roomUser := range roomUsers {
 		if roomUser.UserId == userId {
-			defer failWithRollBack(tx, fmt.Errorf("user is already in the room"))
+			if result, err := failWithRollBack(tx, nil); err != nil {
+				return result, err
+			}
 			return entity.JoinRoomResultOtherErr, nil
 		}
 	}

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/pollenjp/gameserver-go/api/entity"
 	"github.com/pollenjp/gameserver-go/api/service"
@@ -32,7 +33,7 @@ func (r *Repository) GetRoomUsers(
 		roomId,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GetRoomUsers: %w", err)
 	}
 	return roomUsers, nil
 }
