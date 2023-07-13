@@ -6,7 +6,6 @@ package service
 import (
 	"context"
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
 	"sync"
 )
 
@@ -20,7 +19,7 @@ var _ CreateUserRepository = &CreateUserRepositoryMock{}
 //
 //		// make and configure a mocked CreateUserRepository
 //		mockedCreateUserRepository := &CreateUserRepositoryMock{
-//			CreateUserFunc: func(ctx context.Context, db repository.Execer, u *entity.User) error {
+//			CreateUserFunc: func(ctx context.Context, db Execer, u *entity.User) error {
 //				panic("mock out the CreateUser method")
 //			},
 //		}
@@ -31,7 +30,7 @@ var _ CreateUserRepository = &CreateUserRepositoryMock{}
 //	}
 type CreateUserRepositoryMock struct {
 	// CreateUserFunc mocks the CreateUser method.
-	CreateUserFunc func(ctx context.Context, db repository.Execer, u *entity.User) error
+	CreateUserFunc func(ctx context.Context, db Execer, u *entity.User) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -40,7 +39,7 @@ type CreateUserRepositoryMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Db is the db argument value.
-			Db repository.Execer
+			Db Execer
 			// U is the u argument value.
 			U *entity.User
 		}
@@ -49,13 +48,13 @@ type CreateUserRepositoryMock struct {
 }
 
 // CreateUser calls CreateUserFunc.
-func (mock *CreateUserRepositoryMock) CreateUser(ctx context.Context, db repository.Execer, u *entity.User) error {
+func (mock *CreateUserRepositoryMock) CreateUser(ctx context.Context, db Execer, u *entity.User) error {
 	if mock.CreateUserFunc == nil {
 		panic("CreateUserRepositoryMock.CreateUserFunc: method is nil but CreateUserRepository.CreateUser was just called")
 	}
 	callInfo := struct {
 		Ctx context.Context
-		Db  repository.Execer
+		Db  Execer
 		U   *entity.User
 	}{
 		Ctx: ctx,
@@ -74,12 +73,12 @@ func (mock *CreateUserRepositoryMock) CreateUser(ctx context.Context, db reposit
 //	len(mockedCreateUserRepository.CreateUserCalls())
 func (mock *CreateUserRepositoryMock) CreateUserCalls() []struct {
 	Ctx context.Context
-	Db  repository.Execer
+	Db  Execer
 	U   *entity.User
 } {
 	var calls []struct {
 		Ctx context.Context
-		Db  repository.Execer
+		Db  Execer
 		U   *entity.User
 	}
 	mock.lockCreateUser.RLock()

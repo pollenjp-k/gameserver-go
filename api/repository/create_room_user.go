@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/pollenjp/gameserver-go/api/entity"
+	"github.com/pollenjp/gameserver-go/api/service"
 )
 
 func (r *Repository) CreateRoomUser(
 	ctx context.Context,
-	db Execer,
+	db service.Execer,
 	roomId entity.RoomId,
 	userId entity.UserId,
 	liveDifficulty entity.LiveDifficulty,

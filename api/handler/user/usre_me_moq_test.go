@@ -19,7 +19,7 @@ var _ GetUserService = &GetUserServiceMock{}
 //
 //		// make and configure a mocked GetUserService
 //		mockedGetUserService := &GetUserServiceMock{
-//			GetUserFunc: func(ctx context.Context, userId entity.UserID) (*entity.User, error) {
+//			GetUserFunc: func(ctx context.Context, userId entity.UserId) (*entity.User, error) {
 //				panic("mock out the GetUser method")
 //			},
 //		}

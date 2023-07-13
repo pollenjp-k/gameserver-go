@@ -5,15 +5,15 @@ import (
 	"net/http"
 
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
+	"github.com/pollenjp/gameserver-go/api/service"
 )
 
 //go:generate go run github.com/matryer/moq -out auth_moq_test.go . AuthRepository
 type AuthRepository interface {
-	GetUserFromToken(ctx context.Context, db repository.Queryer, userToken entity.UserTokenType) (*entity.User, error)
+	GetUserFromToken(ctx context.Context, db service.Queryer, userToken entity.UserTokenType) (*entity.User, error)
 }
 
-func NewAuthorizer(db repository.Queryer, repo AuthRepository) *Authorizer {
+func NewAuthorizer(db service.Queryer, repo AuthRepository) *Authorizer {
 	return &Authorizer{
 		DB:   db,
 		Repo: repo,
@@ -21,7 +21,7 @@ func NewAuthorizer(db repository.Queryer, repo AuthRepository) *Authorizer {
 }
 
 type Authorizer struct {
-	DB   repository.Queryer
+	DB   service.Queryer
 	Repo AuthRepository
 }
 

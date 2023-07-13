@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/pollenjp/gameserver-go/api/entity"
+	"github.com/pollenjp/gameserver-go/api/service"
 )
 
 func (r *Repository) CreateRoom(
 	ctx context.Context,
-	db Execer,
+	db service.Execer,
 	liveId entity.LiveId,
 	hostUserId entity.UserId,
 ) (*entity.Room, error) {

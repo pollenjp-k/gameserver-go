@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pollenjp/gameserver-go/api/clock"
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
+	"github.com/pollenjp/gameserver-go/api/service"
 )
 
 func TestAuthorizer(t *testing.T) {
@@ -80,7 +80,7 @@ func TestAuthorizer(t *testing.T) {
 			moq := &AuthRepositoryMock{}
 			moq.GetUserFromTokenFunc = func(
 				_ context.Context,
-				_ repository.Queryer,
+				_ service.Queryer,
 				token entity.UserTokenType,
 			) (*entity.User, error) {
 				if tt.isOk {

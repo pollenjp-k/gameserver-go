@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/pollenjp/gameserver-go/api/clock"
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
 )
 
 func TestGetUser(t *testing.T) {
@@ -46,7 +45,7 @@ func TestGetUser(t *testing.T) {
 			moq := &UserGetterMock{}
 			moq.GetUserFromIdFunc = func(
 				_ context.Context,
-				_ repository.Queryer,
+				_ Queryer,
 				_ entity.UserId,
 			) (*entity.User, error) {
 				u := dummyUser

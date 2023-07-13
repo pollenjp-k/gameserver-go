@@ -5,16 +5,15 @@ import (
 	"fmt"
 
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
 )
 
 //go:generate go run github.com/matryer/moq -out create_user_moq_test.go . CreateUserRepository
 type CreateUserRepository interface {
-	CreateUser(ctx context.Context, db repository.Execer, u *entity.User) error
+	CreateUser(ctx context.Context, db Execer, u *entity.User) error
 }
 
 type CreateUser struct {
-	DB   repository.Execer
+	DB   Execer
 	Repo CreateUserRepository
 }
 

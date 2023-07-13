@@ -4,16 +4,15 @@ import (
 	"context"
 
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
 )
 
 //go:generate go run github.com/matryer/moq -out get_user_moq_test.go . UserGetter
 type UserGetter interface {
-	GetUserFromId(ctx context.Context, db repository.Queryer, userId entity.UserId) (*entity.User, error)
+	GetUserFromId(ctx context.Context, db Queryer, userId entity.UserId) (*entity.User, error)
 }
 
 type GetUser struct {
-	DB   repository.Queryer
+	DB   Queryer
 	Repo UserGetter
 }
 

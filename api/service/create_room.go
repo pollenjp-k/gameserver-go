@@ -6,20 +6,19 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
 )
 
 //go:generate go run github.com/matryer/moq -out create_room_moq_test.go . CreateRoomRepository
 type CreateRoomRepository interface {
 	CreateRoom(
 		ctx context.Context,
-		db repository.Execer,
+		db Execer,
 		liveId entity.LiveId,
 		hostUserId entity.UserId,
 	) (*entity.Room, error)
 	CreateRoomUser(
 		ctx context.Context,
-		db repository.Execer,
+		db Execer,
 		roomId entity.RoomId,
 		userId entity.UserId,
 		liveDifficulty entity.LiveDifficulty,
@@ -27,7 +26,7 @@ type CreateRoomRepository interface {
 }
 
 type CreateRoom struct {
-	DB   repository.Beginner
+	DB   Beginner
 	Repo CreateRoomRepository
 }
 

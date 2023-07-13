@@ -6,7 +6,7 @@ package auth
 import (
 	"context"
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
+	"github.com/pollenjp/gameserver-go/api/service"
 	"sync"
 )
 
@@ -20,7 +20,7 @@ var _ AuthRepository = &AuthRepositoryMock{}
 //
 //		// make and configure a mocked AuthRepository
 //		mockedAuthRepository := &AuthRepositoryMock{
-//			GetUserFromTokenFunc: func(ctx context.Context, db repository.Queryer, userToken entity.UserTokenType) (*entity.User, error) {
+//			GetUserFromTokenFunc: func(ctx context.Context, db service.Queryer, userToken entity.UserTokenType) (*entity.User, error) {
 //				panic("mock out the GetUserFromToken method")
 //			},
 //		}
@@ -31,7 +31,7 @@ var _ AuthRepository = &AuthRepositoryMock{}
 //	}
 type AuthRepositoryMock struct {
 	// GetUserFromTokenFunc mocks the GetUserFromToken method.
-	GetUserFromTokenFunc func(ctx context.Context, db repository.Queryer, userToken entity.UserTokenType) (*entity.User, error)
+	GetUserFromTokenFunc func(ctx context.Context, db service.Queryer, userToken entity.UserTokenType) (*entity.User, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -40,7 +40,7 @@ type AuthRepositoryMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Db is the db argument value.
-			Db repository.Queryer
+			Db service.Queryer
 			// UserToken is the userToken argument value.
 			UserToken entity.UserTokenType
 		}
@@ -49,13 +49,13 @@ type AuthRepositoryMock struct {
 }
 
 // GetUserFromToken calls GetUserFromTokenFunc.
-func (mock *AuthRepositoryMock) GetUserFromToken(ctx context.Context, db repository.Queryer, userToken entity.UserTokenType) (*entity.User, error) {
+func (mock *AuthRepositoryMock) GetUserFromToken(ctx context.Context, db service.Queryer, userToken entity.UserTokenType) (*entity.User, error) {
 	if mock.GetUserFromTokenFunc == nil {
 		panic("AuthRepositoryMock.GetUserFromTokenFunc: method is nil but AuthRepository.GetUserFromToken was just called")
 	}
 	callInfo := struct {
 		Ctx       context.Context
-		Db        repository.Queryer
+		Db        service.Queryer
 		UserToken entity.UserTokenType
 	}{
 		Ctx:       ctx,
@@ -74,12 +74,12 @@ func (mock *AuthRepositoryMock) GetUserFromToken(ctx context.Context, db reposit
 //	len(mockedAuthRepository.GetUserFromTokenCalls())
 func (mock *AuthRepositoryMock) GetUserFromTokenCalls() []struct {
 	Ctx       context.Context
-	Db        repository.Queryer
+	Db        service.Queryer
 	UserToken entity.UserTokenType
 } {
 	var calls []struct {
 		Ctx       context.Context
-		Db        repository.Queryer
+		Db        service.Queryer
 		UserToken entity.UserTokenType
 	}
 	mock.lockGetUserFromToken.RLock()
