@@ -29,3 +29,9 @@ make db-exec
 USE webapp;
 SHOW tables;
 ```
+
+### local build
+
+```sh
+GOOS=linux GOARCH=amd64 go build
+```
