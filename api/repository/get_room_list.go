@@ -10,7 +10,7 @@ import (
 func (r *Repository) GetRoomList(
 	ctx context.Context,
 	db service.Queryer,
-	liveId entity.LiveId,
+	RoomStatus entity.RoomStatus,
 ) ([]*service.RoomInfoItem, error) {
 	roomList := []*service.RoomInfoItem{}
 
@@ -27,8 +27,6 @@ func (r *Repository) GetRoomList(
 			FROM
 				room
 			WHERE
-				live_id = ?
-				AND
 				status = ?
 		)
 	SELECT
@@ -50,8 +48,7 @@ func (r *Repository) GetRoomList(
 		ctx,
 		&roomList,
 		sql,
-		liveId,
-		entity.RoomStatusWaiting,
+		RoomStatus,
 	)
 	if err != nil {
 		return nil, err
