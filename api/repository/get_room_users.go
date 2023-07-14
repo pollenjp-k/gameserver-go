@@ -19,7 +19,8 @@ func (r *Repository) GetRoomUsers(
 	SELECT
 		room_id,
 		user_id,
-		live_difficulty
+		live_difficulty,
+		status
 	FROM
 		room_user
 	WHERE
