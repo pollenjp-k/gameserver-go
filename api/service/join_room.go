@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/pollenjp/gameserver-go/api/config"
@@ -70,11 +71,13 @@ func (cr *JoinRoom) JoinRoom(
 		if result, err := failWithRollBack(tx, nil); err != nil {
 			return result, err
 		}
+		log.Printf("room is already started: %v", room)
 		return entity.JoinRoomResultOtherErr, nil
 	case entity.RoomStatusDissolution:
 		if result, err := failWithRollBack(tx, nil); err != nil {
 			return result, err
 		}
+		log.Printf("room is already dissolution: %v", room)
 		return entity.JoinRoomResultDisbanded, nil
 	default:
 		return failWithRollBack(tx, fmt.Errorf("unknown room status: %v", room.Status))
@@ -98,6 +101,7 @@ func (cr *JoinRoom) JoinRoom(
 			if result, err := failWithRollBack(tx, nil); err != nil {
 				return result, err
 			}
+			log.Printf("user is already in the room: %v", userId)
 			return entity.JoinRoomResultOtherErr, nil
 		}
 	}
