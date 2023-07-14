@@ -118,6 +118,13 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 			},
 			Validator: validator.New(),
 		}
+		lr := &room.LeaveRoom{
+			Service: &service.LeaveRoom{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
 		mux.Route("/room", func(r chi.Router) {
 			r.Use(handler.AuthMiddleware(au))
 			r.Post("/create", cr.ServeHTTP)
@@ -127,6 +134,7 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 			r.Post("/start", sr.ServeHTTP)
 			r.Post("/end", er.ServeHTTP)
 			r.Post("/result", rr.ServeHTTP)
+			r.Post("/leave", lr.ServeHTTP)
 		})
 	}
 

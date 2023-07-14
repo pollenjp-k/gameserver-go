@@ -44,10 +44,16 @@ type Queryer interface {
 	SelectContext(ctx context.Context, dest interface{}, query string, args ...any) error
 }
 
+type QueryerAndExecer interface {
+	Queryer
+	Execer
+}
+
 var (
-	_ Beginner = (*sqlx.DB)(nil)
-	_ Preparer = (*sqlx.DB)(nil)
-	_ Queryer  = (*sqlx.DB)(nil)
-	_ Execer   = (*sqlx.DB)(nil)
-	_ Execer   = (*sqlx.Tx)(nil)
+	_ Beginner         = (*sqlx.DB)(nil)
+	_ Preparer         = (*sqlx.DB)(nil)
+	_ Queryer          = (*sqlx.DB)(nil)
+	_ Execer           = (*sqlx.DB)(nil)
+	_ QueryerAndExecer = (*sqlx.DB)(nil)
+	_ Execer           = (*sqlx.Tx)(nil)
 )
