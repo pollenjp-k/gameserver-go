@@ -60,7 +60,7 @@ func (cr *StartRoom) StartRoom(
 	}
 
 	if room.Status != entity.RoomStatusWaiting {
-		return failWithRollBack(tx, fmt.Errorf("room status: %v", room.Status))
+		return failWithRollBack(tx, fmt.Errorf("room status is not waiting: %v", room.Status))
 	}
 
 	if err := cr.Repo.UpdateRoomStatus(ctx, tx, roomId, entity.RoomStatusLiveStart); err != nil {

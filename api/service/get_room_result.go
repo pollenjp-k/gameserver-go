@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 
 	"github.com/pollenjp/gameserver-go/api/entity"
 )
@@ -33,6 +34,7 @@ type RoomUserAndScore struct {
 // go:generate go run github.com/matryer/moq -out get_room_result_moq_test.go . GetRoomResultRepository
 type GetRoomResultRepository interface {
 	GetRoomUserAndScoreInRoom(ctx context.Context, db Queryer, roomId entity.RoomId) ([]*RoomUserAndScore, error)
+	GetRoomUsers(ctx context.Context, db Queryer, roomId entity.RoomId) ([]*entity.RoomUser, error)
 }
 
 type GetRoomResult struct {
@@ -44,18 +46,14 @@ func (grr *GetRoomResult) GetRoomResult(
 	ctx context.Context,
 	roomId entity.RoomId,
 ) ([]*RoomUserResult, error) {
-	userAndScores, err := grr.Repo.GetRoomUserAndScoreInRoom(ctx, grr.DB, roomId)
+	roomUsers, err := grr.Repo.GetRoomUsers(ctx, grr.DB, roomId)
 	if err != nil {
 		return nil, err
 	}
 
-	m := make(map[entity.UserId]*RoomUserAndScore)
-	for _, us := range userAndScores {
-		if us.UserStatus != entity.RoomUserStatusFinished {
-			// 終わってて居ない人がいる場合は空のリストを返す
-			return []*RoomUserResult{}, nil
-		}
-		m[us.UserId] = us
+	m := make(map[entity.UserId]*entity.RoomUser, len(roomUsers))
+	for _, ru := range roomUsers {
+		m[ru.UserId] = ru
 	}
 
 	userId, ok := GetUserId(ctx)
@@ -66,6 +64,25 @@ func (grr *GetRoomResult) GetRoomResult(
 	// ルームに参加していないユーザーは結果を見れない
 	if _, ok := m[userId]; !ok {
 		return nil, &entity.ErrPermissionDenied{}
+	}
+
+	// 全員が終わっていない場合は結果を見れない
+	allFinished := func(roomUsers []*entity.RoomUser) bool {
+		for _, ru := range roomUsers {
+			if !entity.HasScore(ru.Status) {
+				return false
+			}
+		}
+		return true
+	}
+	if !allFinished(roomUsers) {
+		log.Printf("GetRoomResult: not all users finished yet")
+		return []*RoomUserResult{}, nil
+	}
+
+	userAndScores, err := grr.Repo.GetRoomUserAndScoreInRoom(ctx, grr.DB, roomId)
+	if err != nil {
+		return nil, err
 	}
 
 	roomUserResults := make([]*RoomUserResult, len(userAndScores))
