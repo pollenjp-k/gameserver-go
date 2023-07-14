@@ -126,15 +126,14 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 			Validator: validator.New(),
 		}
 		mux.Route("/room", func(r chi.Router) {
-			r.Use(handler.AuthMiddleware(au))
-			r.Post("/create", cr.ServeHTTP)
+			r.Post("/create", handler.AuthMiddleware(au)(cr).ServeHTTP)
 			r.Post("/list", rl.ServeHTTP)
-			r.Post("/join", jr.ServeHTTP)
-			r.Post("/wait", wr.ServeHTTP)
-			r.Post("/start", sr.ServeHTTP)
-			r.Post("/end", er.ServeHTTP)
-			r.Post("/result", rr.ServeHTTP)
-			r.Post("/leave", lr.ServeHTTP)
+			r.Post("/join", handler.AuthMiddleware(au)(jr).ServeHTTP)
+			r.Post("/wait", handler.AuthMiddleware(au)(wr).ServeHTTP)
+			r.Post("/start", handler.AuthMiddleware(au)(sr).ServeHTTP)
+			r.Post("/end", handler.AuthMiddleware(au)(er).ServeHTTP)
+			r.Post("/result", handler.AuthMiddleware(au)(rr).ServeHTTP)
+			r.Post("/leave", handler.AuthMiddleware(au)(lr).ServeHTTP)
 		})
 	}
 
