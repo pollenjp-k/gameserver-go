@@ -5,9 +5,9 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/pollenjp/gameserver-go/api/auth"
 	"github.com/pollenjp/gameserver-go/api/entity"
 	"github.com/pollenjp/gameserver-go/api/handler"
+	"github.com/pollenjp/gameserver-go/api/service"
 )
 
 //go:generate go run github.com/matryer/moq -out usre_me_moq_test.go . GetUserService
@@ -25,7 +25,7 @@ type UserMe struct {
 
 func (ru *UserMe) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	userId, isOk := auth.GetUserId(ctx)
+	userId, isOk := service.GetUserId(ctx)
 	if !isOk {
 		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: "failed to get user id from token",

@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/pollenjp/gameserver-go/api/auth"
 	"github.com/pollenjp/gameserver-go/api/entity"
 	"github.com/pollenjp/gameserver-go/api/handler"
+	"github.com/pollenjp/gameserver-go/api/service"
 )
 
 // TODO: convert to //go:generate when writing tests
@@ -52,7 +52,7 @@ func (ru *CreateRoom) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId, ok := auth.GetUserId(ctx)
+	userId, ok := service.GetUserId(ctx)
 	if !ok {
 		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: "failed to get user id from context",

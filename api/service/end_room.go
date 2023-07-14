@@ -60,7 +60,7 @@ func (er *EndRoom) EndRoom(
 		return fail(fmt.Errorf("BeginTxx: %w", err))
 	}
 
-	if err := er.Repo.UpdateRoomUserStatus(ctx, tx, score.RoomId, score.UserId, entity.RoomUserStatusEnd); err != nil {
+	if err := er.Repo.UpdateRoomUserStatus(ctx, tx, score.RoomId, score.UserId, entity.RoomUserStatusFinished); err != nil {
 		// TODO: error が起きた場合でも Rollback せずに Status は End にしたほうが良いのか？
 		return failWithRollBack(tx, err)
 	}

@@ -110,7 +110,7 @@ func TestAuthorizer(t *testing.T) {
 				return
 			}
 
-			userId, ok := GetUserId(r.Context())
+			userId, ok := service.GetUserId(r.Context())
 			if !ok {
 				// 既に context に user id がセットされているはずなのにセットされていない
 				t.Error("user id is not set in context")

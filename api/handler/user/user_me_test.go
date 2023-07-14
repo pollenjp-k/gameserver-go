@@ -9,9 +9,9 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
-	"github.com/pollenjp/gameserver-go/api/auth"
 	"github.com/pollenjp/gameserver-go/api/clock"
 	"github.com/pollenjp/gameserver-go/api/entity"
+	"github.com/pollenjp/gameserver-go/api/service"
 	"github.com/pollenjp/gameserver-go/api/testutil"
 )
 
@@ -72,7 +72,7 @@ func TestUserMe(t *testing.T) {
 			}
 
 			// 認証情報の追加
-			ctx := auth.SetUserId(r.Context(), dummyUser.Id)
+			ctx := service.SetUserId(r.Context(), dummyUser.Id)
 			r = r.Clone(ctx)
 
 			sut := UserMe{

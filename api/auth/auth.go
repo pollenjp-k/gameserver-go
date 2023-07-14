@@ -25,8 +25,6 @@ type Authorizer struct {
 	Repo AuthRepository
 }
 
-type userIDKey struct{}
-
 // *http.Request型から認証情報を context に書き込む
 func (au *Authorizer) FillContext(r *http.Request) (*http.Request, error) {
 	token, err := ExtractBearerToken(r)
@@ -39,17 +37,8 @@ func (au *Authorizer) FillContext(r *http.Request) (*http.Request, error) {
 		return nil, err
 	}
 
-	ctx := SetUserId(r.Context(), u.Id)
+	ctx := service.SetUserId(r.Context(), u.Id)
 
 	clone := r.Clone(ctx)
 	return clone, nil
-}
-
-func SetUserId(ctx context.Context, uid entity.UserId) context.Context {
-	return context.WithValue(ctx, userIDKey{}, uid)
-}
-
-func GetUserId(ctx context.Context) (entity.UserId, bool) {
-	id, ok := ctx.Value(userIDKey{}).(entity.UserId)
-	return id, ok
 }
