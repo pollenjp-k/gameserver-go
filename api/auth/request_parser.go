@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -22,7 +23,8 @@ func ExtractBearerToken(r *http.Request) (entity.UserTokenType, error) {
 
 	// "Bearer <トークン>"の形式であることを確認します
 	authParts := strings.Split(authHeader, " ")
-	if len(authParts) != 2 || authParts[0] != "Bearer" {
+	if len(authParts) != 2 || strings.ToLower(authParts[0]) != "bearer" {
+		log.Printf("authParts: %v", authParts)
 		return token, fmt.Errorf("authorization header format must be 'Bearer <token>'")
 	}
 
