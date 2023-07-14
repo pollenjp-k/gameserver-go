@@ -40,10 +40,9 @@ func (u *User) ValidateNotEmpty() error {
 	if u.Token == uZeroValue.Token {
 		return &UserValidationError{MemberName: "Token"}
 	}
-	// Allow Leader Card ID to be zero value
-	// if u.LeaderCardId == uZeroValue.LeaderCardId {
-	// 	return &UserValidationError{MemberName: "LeaderCardId"}
-	// }
+	if u.LeaderCardId == uZeroValue.LeaderCardId {
+		return &UserValidationError{MemberName: "LeaderCardId"}
+	}
 	if u.CreatedAt == uZeroValue.CreatedAt {
 		return &UserValidationError{MemberName: "LeaderCardId"}
 	}
