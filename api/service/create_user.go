@@ -24,11 +24,12 @@ func (ru *CreateUser) CreateUser(
 	leaderCard entity.LeaderCardIdIDType,
 ) (*entity.User, error) {
 	u := &entity.User{
-		Name: name,
+		Name:         name,
+		LeaderCardId: leaderCard,
 	}
 
 	if err := ru.Repo.CreateUser(ctx, ru.DB, u); err != nil {
-		return nil, fmt.Errorf("failed to register: %w", err)
+		return nil, fmt.Errorf("CreateUser: %w", err)
 	}
 	return u, nil
 }
