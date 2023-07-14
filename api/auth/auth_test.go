@@ -72,7 +72,7 @@ func TestAuthorizer(t *testing.T) {
 				Id:           1,
 				Name:         "test",
 				Token:        token,
-				LeaderCardId: 0,
+				LeaderCardId: 1,
 				CreatedAt:    c.Now(),
 				UpdatedAt:    c.Now(),
 			}

@@ -51,7 +51,7 @@ func TestUserMe(t *testing.T) {
 				Id:           1,
 				Name:         "test",
 				Token:        entity.UserTokenType(uuid.NewString()),
-				LeaderCardId: 0,
+				LeaderCardId: 1,
 				CreatedAt:    c.Now(),
 				UpdatedAt:    c.Now(),
 			}
