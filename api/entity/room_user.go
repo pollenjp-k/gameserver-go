@@ -5,8 +5,8 @@ type RoomUserStatus int
 const (
 	// Waiting	ホストがライブ開始ボタン押すのを待っている
 	// End	ライブ終了
-	RoomUserStatusWaiting RoomUserStatus = 1
-	RoomUserStatusEnd     RoomUserStatus = 2
+	RoomUserStatusWaiting  RoomUserStatus = 1
+	RoomUserStatusFinished RoomUserStatus = 2
 )
 
 type RoomUser struct {
