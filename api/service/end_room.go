@@ -24,13 +24,6 @@ type EndRoomRepository interface {
 		userId entity.UserId,
 		status entity.RoomUserStatus,
 	) error
-
-	// TODO: SQL側でフィルターする関数を別途作っても良い
-	GetRoomUsers(
-		ctx context.Context,
-		db Queryer,
-		roomId entity.RoomId,
-	) ([]*entity.RoomUser, error)
 }
 
 type EndRoom struct {

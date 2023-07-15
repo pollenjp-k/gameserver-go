@@ -31,7 +31,7 @@ type WaitRoomRepository interface {
 		db Queryer,
 		roomId entity.RoomId,
 	) (*entity.Room, error)
-	GetWaitingUsers(
+	GetRoomUsersWaiting(
 		ctx context.Context,
 		db Queryer,
 		roomId entity.RoomId,
@@ -60,7 +60,7 @@ func (cr *WaitRoom) WaitRoom(
 		return fail(err)
 	}
 
-	waitingRoomUser, err := cr.Repo.GetWaitingUsers(ctx, db, roomId)
+	waitingRoomUser, err := cr.Repo.GetRoomUsersWaiting(ctx, db, roomId)
 	if err != nil {
 		return fail(err)
 	}

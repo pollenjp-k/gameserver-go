@@ -18,6 +18,26 @@ type RoomUserResult struct {
 	JudgeMiss    int
 }
 
+func NewRoomUserResult(
+	userId entity.UserId,
+	score int,
+	judgePerfect int,
+	judgeGreat int,
+	judgeGood int,
+	judgeBad int,
+	judgeMiss int,
+) *RoomUserResult {
+	return &RoomUserResult{
+		UserId:       userId,
+		Score:        score,
+		JudgePerfect: judgePerfect,
+		JudgeGreat:   judgeGreat,
+		JudgeGood:    judgeGood,
+		JudgeBad:     judgeBad,
+		JudgeMiss:    judgeMiss,
+	}
+}
+
 // Repository からの受け取り
 type RoomUserAndScore struct {
 	UserId       entity.UserId         `db:"user_id"`
@@ -34,7 +54,11 @@ type RoomUserAndScore struct {
 // go:generate go run github.com/matryer/moq -out get_room_result_moq_test.go . GetRoomResultRepository
 type GetRoomResultRepository interface {
 	GetRoomUserAndScoreInRoom(ctx context.Context, db Queryer, roomId entity.RoomId) ([]*RoomUserAndScore, error)
-	GetRoomUsers(ctx context.Context, db Queryer, roomId entity.RoomId) ([]*entity.RoomUser, error)
+	GetRoomUsers(
+		ctx context.Context,
+		db Queryer,
+		roomId entity.RoomId,
+	) ([]*entity.RoomUser, error)
 }
 
 type GetRoomResult struct {
@@ -42,42 +66,39 @@ type GetRoomResult struct {
 	Repo GetRoomResultRepository
 }
 
+type RoomUserResultList []*RoomUserResult
+
 func (grr *GetRoomResult) GetRoomResult(
 	ctx context.Context,
 	roomId entity.RoomId,
-) ([]*RoomUserResult, error) {
+) (RoomUserResultList, error) {
+	// TODO: roomId auth check
+	// ルームに参加していないユーザーは結果を見れない
+	// userId, ok := GetUserId(ctx)
+	// if !ok {
+	// 	return nil, &entity.ErrUnauthorized{}
+	// }
+	// m := make(map[entity.UserId]*entity.RoomUser, len(roomUsers))
+	// for _, ru := range roomUsers {
+	// 	m[ru.UserId] = ru
+	// }
+
 	roomUsers, err := grr.Repo.GetRoomUsers(ctx, grr.DB, roomId)
 	if err != nil {
 		return nil, err
 	}
 
-	m := make(map[entity.UserId]*entity.RoomUser, len(roomUsers))
+	Status2RoomUser := make(map[entity.RoomUserStatus]*entity.RoomUser)
+	UserId2RoomUser := make(map[entity.UserId]*entity.RoomUser)
 	for _, ru := range roomUsers {
-		m[ru.UserId] = ru
+		Status2RoomUser[ru.Status] = ru
+		UserId2RoomUser[ru.UserId] = ru
 	}
 
-	userId, ok := GetUserId(ctx)
-	if !ok {
-		return nil, &entity.ErrUnauthorized{}
-	}
-
-	// ルームに参加していないユーザーは結果を見れない
-	if _, ok := m[userId]; !ok {
-		return nil, &entity.ErrPermissionDenied{}
-	}
-
-	// 全員が終わっていない場合は結果を見れない
-	allFinished := func(roomUsers []*entity.RoomUser) bool {
-		for _, ru := range roomUsers {
-			if !entity.HasScore(ru.Status) {
-				return false
-			}
-		}
-		return true
-	}
-	if !allFinished(roomUsers) {
-		log.Printf("GetRoomResult: not all users finished yet")
-		return []*RoomUserResult{}, nil
+	// もし WaitingUser の人がいる場合は結果を見れない
+	if _, ok := Status2RoomUser[entity.RoomUserStatusWaiting]; ok {
+		log.Printf("GetRoomResult: waiting user exists")
+		return RoomUserResultList{}, nil
 	}
 
 	userAndScores, err := grr.Repo.GetRoomUserAndScoreInRoom(ctx, grr.DB, roomId)
@@ -85,17 +106,17 @@ func (grr *GetRoomResult) GetRoomResult(
 		return nil, err
 	}
 
-	roomUserResults := make([]*RoomUserResult, len(userAndScores))
+	roomUserResults := make(RoomUserResultList, len(userAndScores))
 	for i, us := range userAndScores {
-		roomUserResults[i] = &RoomUserResult{
-			UserId:       us.UserId,
-			Score:        us.Score,
-			JudgePerfect: us.JudgePerfect,
-			JudgeGreat:   us.JudgeGreat,
-			JudgeGood:    us.JudgeGood,
-			JudgeBad:     us.JudgeBad,
-			JudgeMiss:    us.JudgeMiss,
-		}
+		roomUserResults[i] = NewRoomUserResult(
+			us.UserId,
+			us.Score,
+			us.JudgePerfect,
+			us.JudgeGreat,
+			us.JudgeGood,
+			us.JudgeBad,
+			us.JudgeMiss,
+		)
 	}
 
 	return roomUserResults, nil

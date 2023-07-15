@@ -7,7 +7,7 @@ import (
 	"github.com/pollenjp/gameserver-go/api/service"
 )
 
-func (r *Repository) GetWaitingUsers(
+func (r *Repository) GetRoomUsersWaiting(
 	ctx context.Context,
 	db service.Queryer,
 	roomId entity.RoomId,
@@ -27,6 +27,7 @@ func (r *Repository) GetWaitingUsers(
 				room_user.user_id = user.id
 	WHERE
 		room_user.room_id = ?
+		room_user.status = ?
 	;`
 
 	err := db.SelectContext(
@@ -34,6 +35,7 @@ func (r *Repository) GetWaitingUsers(
 		&waitingRoomUser,
 		sql,
 		roomId,
+		entity.RoomUserStatusWaiting,
 	)
 	if err != nil {
 		return nil, err

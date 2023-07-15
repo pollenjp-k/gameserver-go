@@ -34,7 +34,7 @@ type LeaveRoom struct {
 	Repo LeaveRoomRepository
 }
 
-// トランザクションは貼らなくて良いはず...?
+// TODO: host user が抜けたら別の人に譲渡される
 func (cr *LeaveRoom) LeaveRoom(
 	ctx context.Context,
 	roomId entity.RoomId,
