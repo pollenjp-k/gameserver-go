@@ -27,7 +27,7 @@ type UpdateUser struct {
 
 type UpdateUserRequestJson struct {
 	Name         string                    `json:"user_name" validate:"required"`
-	LeaderCardId entity.LeaderCardIdIDType `json:"leader_card_id"`
+	LeaderCardId entity.LeaderCardIdIDType `json:"leader_card_id" validate:"required"`
 }
 
 func (ru *UpdateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
