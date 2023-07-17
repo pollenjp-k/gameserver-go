@@ -26,14 +26,19 @@ type CreateRoom struct {
 	Validator *validator.Validate
 }
 
+type CreateRoomRequestJson struct {
+	// 0 の可能性がある
+	LiveId           entity.LiveId         `json:"live_id"`
+	SelectDifficulty entity.LiveDifficulty `json:"select_difficulty" validate:"required"`
+}
+
+type CreateRoomResponseJson struct {
+	RoomId entity.RoomId `json:"room_id"`
+}
+
 func (ru *CreateRoom) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	var body struct {
-		// 0 の可能性がある
-		LiveId           entity.LiveId         `json:"live_id"`
-		SelectDifficulty entity.LiveDifficulty `json:"select_difficulty" validate:"required"`
-	}
-
+	var body CreateRoomRequestJson
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: err.Error(),
@@ -68,9 +73,7 @@ func (ru *CreateRoom) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rsp := struct {
-		RoomId entity.RoomId `json:"room_id"`
-	}{
+	rsp := CreateRoomResponseJson{
 		RoomId: room.Id,
 	}
 	handler.RespondJson(ctx, w, rsp, http.StatusOK)

@@ -13,36 +13,9 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/pollenjp/gameserver-go/api/config"
 	"github.com/pollenjp/gameserver-go/api/entity"
+	roomHandler "github.com/pollenjp/gameserver-go/api/handler/room"
 	userHandler "github.com/pollenjp/gameserver-go/api/handler/user"
 )
-
-// response body from `/user/create`
-func GotBodyOfUserCreate(t *testing.T, mux http.Handler, reqBody userHandler.CreateUserRequestJson) []byte {
-	t.Helper()
-
-	reqBodyJson, err := json.Marshal(reqBody)
-	if err != nil {
-		t.Fatalf("failed to marshal request body: %v", err)
-	}
-	req := httptest.NewRequest(http.MethodPost, "/user/create", bytes.NewBuffer(reqBodyJson))
-	w := httptest.NewRecorder()
-	mux.ServeHTTP(w, req)
-	rsp := w.Result()
-	defer func() {
-		_ = rsp.Body.Close()
-	}()
-
-	gotBody, err := io.ReadAll(rsp.Body)
-	if err != nil {
-		t.Fatalf("failed to read body: %v", err)
-	}
-
-	if rsp.StatusCode != http.StatusOK {
-		FatalErrorWithStatusCodeAndBody(t, http.StatusOK, rsp.StatusCode, gotBody)
-	}
-
-	return gotBody
-}
 
 // - `/user/create`
 func TestNewMuxUserCreate(t *testing.T) {
@@ -66,19 +39,7 @@ func TestNewMuxUserCreate(t *testing.T) {
 		LeaderCardId: 1,
 	})
 
-	// ありのままに変換
-	{
-		var gotJson interface{}
-		if err := json.Unmarshal([]byte(gotBody), &gotJson); err != nil {
-			t.Fatalf("json unmarshal: %v", err)
-		}
-
-		// 期待するキーの数を確認
-		expectedKeyNum := 1
-		if len(gotJson.(map[string]interface{})) != expectedKeyNum {
-			t.Errorf("expected to have %d key, but got %d", expectedKeyNum, len(gotJson.(map[string]interface{})))
-		}
-	}
+	CheckJsonKeyNum(t, gotBody, 1)
 
 	// 期待する型に変換
 	{
@@ -142,7 +103,7 @@ func TestNewMuxUserMe(t *testing.T) {
 
 		gotBody, err := io.ReadAll(rsp.Body)
 		if err != nil {
-			t.Fatalf("failed to read body: %v", err)
+			t.Fatalf("read body: %v", err)
 		}
 
 		var gotTypedJson userHandler.UserMeResponseJson
@@ -224,21 +185,86 @@ func TestNewMuxUserUpdate(t *testing.T) {
 
 		gotBody, err := io.ReadAll(rsp.Body)
 		if err != nil {
-			t.Fatalf("failed to read body: %v", err)
+			t.Fatalf("read body: %v", err)
 		}
 
 		if rsp.StatusCode != http.StatusOK {
 			FatalErrorWithStatusCodeAndBody(t, http.StatusOK, rsp.StatusCode, gotBody)
 		}
 
-		var gotJson interface{}
-		if err := json.Unmarshal([]byte(gotBody), &gotJson); err != nil {
+		CheckJsonKeyNum(t, gotBody, 0)
+	}
+}
+
+// - `/room/create`
+func TestNewMuxRoomCreate(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	cfg, err := config.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	mux, cleanup, err := NewMux(ctx, cfg)
+	t.Cleanup(cleanup)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sampleUser := entity.User{
+		Name:         "test",
+		LeaderCardId: 1,
+	}
+
+	// `/user/create`
+	{
+		gotBody := GotBodyOfUserCreate(t, mux, userHandler.CreateUserRequestJson{
+			Name:         sampleUser.Name,
+			LeaderCardId: sampleUser.LeaderCardId,
+		})
+
+		var gotTypedJson userHandler.CreateUserResponseJson
+		if err := json.Unmarshal([]byte(gotBody), &gotTypedJson); err != nil {
 			t.Fatalf("json unmarshal: %v", err)
 		}
 
-		expectedKeyNum := 0
-		if len(gotJson.(map[string]interface{})) != expectedKeyNum {
-			t.Errorf("expected to have %d key, but got %d", expectedKeyNum, len(gotJson.(map[string]interface{})))
+		sampleUser.Token = gotTypedJson.Token
+	}
+
+	// `/room/create`
+	{
+		reqJsonBody := []byte(
+			`{
+			"live_id": 0,
+			"select_difficulty": 1
+			}`,
+		)
+		w := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/room/create", bytes.NewBuffer(reqJsonBody))
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", sampleUser.Token))
+		mux.ServeHTTP(w, req)
+		rsp := w.Result()
+		defer func() {
+			_ = rsp.Body.Close()
+		}()
+
+		gotBody, err := io.ReadAll(rsp.Body)
+		if err != nil {
+			t.Fatalf("read body: %v", err)
+		}
+
+		// check expected key num
+		CheckJsonKeyNum(t, gotBody, 1)
+
+		var gotTypedJson roomHandler.CreateRoomResponseJson
+		if err := json.Unmarshal([]byte(gotBody), &gotTypedJson); err != nil {
+			t.Fatalf("json unmarshal: %v", err)
+		}
+
+		roomId := gotTypedJson.RoomId
+		if roomId <= 0 {
+			t.Fatalf("room id should be greater than 0 (got %d)", roomId)
 		}
 	}
 }
@@ -252,4 +278,45 @@ func FatalErrorWithStatusCodeAndBody(t *testing.T, expectedStatusCode int, gotSt
 		t.Fatalf("json unmarshal: %v", err)
 	}
 	t.Fatalf("error json:%v", errorJson)
+}
+
+func CheckJsonKeyNum(t *testing.T, gotBody []byte, expectedKeyNum int) {
+	t.Helper()
+
+	var gotJson interface{}
+	if err := json.Unmarshal([]byte(gotBody), &gotJson); err != nil {
+		t.Fatalf("json unmarshal: %v", err)
+	}
+
+	if len(gotJson.(map[string]interface{})) != expectedKeyNum {
+		t.Errorf("expected to have %d key, but got %d", expectedKeyNum, len(gotJson.(map[string]interface{})))
+	}
+}
+
+// response body from `/user/create`
+func GotBodyOfUserCreate(t *testing.T, mux http.Handler, reqBody userHandler.CreateUserRequestJson) []byte {
+	t.Helper()
+
+	reqBodyJson, err := json.Marshal(reqBody)
+	if err != nil {
+		t.Fatalf("marshal request body: %v", err)
+	}
+	req := httptest.NewRequest(http.MethodPost, "/user/create", bytes.NewBuffer(reqBodyJson))
+	w := httptest.NewRecorder()
+	mux.ServeHTTP(w, req)
+	rsp := w.Result()
+	defer func() {
+		_ = rsp.Body.Close()
+	}()
+
+	gotBody, err := io.ReadAll(rsp.Body)
+	if err != nil {
+		t.Fatalf("read body: %v", err)
+	}
+
+	if rsp.StatusCode != http.StatusOK {
+		FatalErrorWithStatusCodeAndBody(t, http.StatusOK, rsp.StatusCode, gotBody)
+	}
+
+	return gotBody
 }
