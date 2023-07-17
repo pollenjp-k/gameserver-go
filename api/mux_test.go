@@ -252,5 +252,4 @@ func FatalErrorWithStatusCodeAndBody(t *testing.T, expectedStatusCode int, gotSt
 		t.Fatalf("json unmarshal: %v", err)
 	}
 	t.Fatalf("error json:%v", errorJson)
-
 }
