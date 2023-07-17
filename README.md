@@ -35,3 +35,7 @@ SHOW tables;
 ```sh
 GOOS=linux GOARCH=amd64 go build
 ```
+
+### golangci-lint
+
+Install <https://github.com/golangci/golangci-lint> ([repo](https://github.com/golangci/golangci-lint))
