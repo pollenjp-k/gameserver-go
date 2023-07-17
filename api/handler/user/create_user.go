@@ -24,15 +24,18 @@ type CreateUser struct {
 	Validator *validator.Validate
 }
 
+type CreateUserRequestJson struct {
+	Name         string                    `json:"user_name" validate:"required"`
+	LeaderCardId entity.LeaderCardIdIDType `json:"leader_card_id" validate:"required"`
+}
+
+type CreateUserResponseJson struct {
+	Token entity.UserTokenType `json:"user_token"`
+}
+
 func (ru *CreateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	var body struct {
-		Name string `json:"user_name" validate:"required"`
-		// 指定されていなければゼロ値として許容する.
-		// 今回は値の範囲の明示が無いため.
-		LeaderCardId entity.LeaderCardIdIDType `json:"leader_card_id" validate:"required"`
-	}
-
+	var body CreateUserRequestJson
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: err.Error(),
@@ -59,9 +62,7 @@ func (ru *CreateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rsp := struct {
-		Token entity.UserTokenType `json:"user_token"`
-	}{
+	rsp := CreateUserResponseJson{
 		Token: u.Token,
 	}
 	handler.RespondJson(ctx, w, rsp, http.StatusOK)
