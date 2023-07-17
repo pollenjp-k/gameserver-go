@@ -74,7 +74,7 @@ func TestNewMuxPathUserCreate(t *testing.T) {
 		// 期待するキーの数を確認
 		expectedKeyNum := 1
 		if len(gotJson.(map[string]interface{})) != expectedKeyNum {
-			t.Fatalf("expected to have %d key, but got %d", expectedKeyNum, len(gotJson.(map[string]interface{})))
+			t.Errorf("expected to have %d key, but got %d", expectedKeyNum, len(gotJson.(map[string]interface{})))
 		}
 	}
 
