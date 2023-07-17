@@ -162,7 +162,7 @@ func TestNewMuxUserMe(t *testing.T) {
 	}
 }
 
-// - `/user/upate`
+// - `/user/update`
 func TestNewMuxUserUpdate(t *testing.T) {
 	t.Parallel()
 
