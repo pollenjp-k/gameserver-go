@@ -25,7 +25,7 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 	mux := chi.NewRouter()
 	mux.HandleFunc(
 		"/health",
-		func(w http.ResponseWriter, r *http.Request) {
+		func(w http.ResponseWriter, _ *http.Request) {
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			_, _ = w.Write([]byte(`{"status": "ok"}`))
 		},
