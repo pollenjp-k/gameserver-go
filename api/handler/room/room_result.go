@@ -17,7 +17,7 @@ type RoomResultService interface {
 	GetRoomResult(
 		ctx context.Context,
 		roomId entity.RoomId,
-	) ([]*service.RoomUserResult, error)
+	) (service.RoomUserResultList, error)
 }
 
 type RoomResult struct {
