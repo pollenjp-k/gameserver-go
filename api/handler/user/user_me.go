@@ -23,6 +23,12 @@ type UserMe struct {
 	Validator *validator.Validate
 }
 
+type UserMeResponseJson struct {
+	Id           entity.UserId             `json:"id"`
+	Name         string                    `json:"name"`
+	LeaderCardId entity.LeaderCardIdIDType `json:"leader_card_id"`
+}
+
 func (ru *UserMe) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userId, isOk := service.GetUserId(ctx)
@@ -41,11 +47,7 @@ func (ru *UserMe) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rsp := struct {
-		Id           entity.UserId             `json:"id"`
-		Name         string                    `json:"name"`
-		LeaderCardId entity.LeaderCardIdIDType `json:"leader_card_id"`
-	}{
+	rsp := UserMeResponseJson{
 		Id:           u.Id,
 		Name:         u.Name,
 		LeaderCardId: u.LeaderCardId,

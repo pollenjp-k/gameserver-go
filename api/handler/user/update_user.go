@@ -25,6 +25,11 @@ type UpdateUser struct {
 	Validator *validator.Validate
 }
 
+type UpdateUserRequestJson struct {
+	Name         string                    `json:"user_name" validate:"required"`
+	LeaderCardId entity.LeaderCardIdIDType `json:"leader_card_id"`
+}
+
 func (ru *UpdateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userId, isOk := service.GetUserId(ctx)
@@ -35,11 +40,7 @@ func (ru *UpdateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var body struct {
-		Name         string                    `json:"user_name" validate:"required"`
-		LeaderCardId entity.LeaderCardIdIDType `json:"leader_card_id"`
-	}
-
+	var body UpdateUserRequestJson
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: err.Error(),
