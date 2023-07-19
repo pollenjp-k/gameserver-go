@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -269,6 +270,99 @@ func TestNewMuxRoomCreate(t *testing.T) {
 	}
 }
 
+// - `/room/create`
+func TestNewMuxRoomListAll(t *testing.T) {
+	t.Parallel()
+
+	ctx := context.Background()
+	cfg, err := config.New()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	mux, cleanup, err := NewMux(ctx, cfg)
+	t.Cleanup(cleanup)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	sampleUser := entity.User{
+		Name:         "test",
+		LeaderCardId: 1,
+	}
+
+	sampleRoom := entity.Room{
+		LiveId: 0,
+	}
+	liveDifficulty := entity.LiveDifficultyNormal
+
+	rspCreateUser, rspCreateRoom := CreateUserAndRoom(
+		t,
+		mux,
+		userHandler.CreateUserRequestJson{
+			Name:         sampleUser.Name,
+			LeaderCardId: sampleUser.LeaderCardId,
+		},
+		roomHandler.CreateRoomRequestJson{
+			LiveId:           sampleRoom.LiveId,
+			SelectDifficulty: liveDifficulty,
+		},
+	)
+
+	sampleUser.Token = rspCreateUser.Token
+
+	// `/room/list`
+
+	var rspListRoom roomHandler.ListRoomResponseJson
+	{
+		reqBody := []byte(`{
+			"live_id": 0
+		}`)
+		w := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/room/list", bytes.NewBuffer(reqBody))
+		mux.ServeHTTP(w, req)
+		rsp := w.Result()
+		defer func() {
+			_ = rsp.Body.Close()
+		}()
+
+		gotBody, err := io.ReadAll(rsp.Body)
+		if err != nil {
+			t.Fatalf("read body: %v", err)
+		}
+
+		if rsp.StatusCode != http.StatusOK {
+			FatalErrorWithStatusCodeAndBody(t, http.StatusOK, rsp.StatusCode, gotBody)
+		}
+
+		if err := json.Unmarshal([]byte(gotBody), &rspListRoom); err != nil {
+			t.Fatalf("json unmarshal: %v", err)
+		}
+	}
+
+	{
+		roomMap := map[entity.RoomId]*roomHandler.ListRoomResponseJsonItem{}
+		roomIds := []entity.RoomId{}
+		for _, roomItem := range rspListRoom.RoomInfoList {
+			roomIds = append(roomIds, roomItem.RoomId)
+			roomMap[roomItem.RoomId] = roomItem
+		}
+		if _, ok := roomMap[rspCreateRoom.RoomId]; !ok {
+			t.Fatalf("created room (%d) is not found in list (%v)", rspCreateRoom.RoomId, roomIds)
+		}
+
+		createdRoomItem := &roomHandler.ListRoomResponseJsonItem{
+			RoomId:          rspCreateRoom.RoomId,
+			LiveId:          sampleRoom.LiveId,
+			JoinedUserCount: 1,
+			MaxUserCount:    config.MaxUserCount,
+		}
+		if !reflect.DeepEqual(roomMap[rspCreateRoom.RoomId], createdRoomItem) {
+			t.Fatalf("expected room item (%v), got (%v)", createdRoomItem, roomMap[rspCreateRoom.RoomId])
+		}
+	}
+}
+
 func FatalErrorWithStatusCodeAndBody(t *testing.T, expectedStatusCode int, gotStatusCode int, gotBody []byte) {
 	t.Helper()
 
@@ -319,4 +413,61 @@ func GotBodyOfUserCreate(t *testing.T, mux http.Handler, reqBody userHandler.Cre
 	}
 
 	return gotBody
+}
+
+func CreateUserAndRoom(
+	t *testing.T,
+	mux http.Handler,
+	reqCreateUser userHandler.CreateUserRequestJson,
+	reqCreateRoom roomHandler.CreateRoomRequestJson,
+) (userHandler.CreateUserResponseJson, roomHandler.CreateRoomResponseJson) {
+	t.Helper()
+
+	// `/user/create`
+
+	var createUserResponseJson userHandler.CreateUserResponseJson
+	{
+		gotJsonBody := GotBodyOfUserCreate(t, mux, reqCreateUser)
+		if err := json.Unmarshal([]byte(gotJsonBody), &createUserResponseJson); err != nil {
+			t.Fatalf("json unmarshal: %v", err)
+		}
+	}
+
+	// `/room/create`
+
+	var createRoomResponseJson roomHandler.CreateRoomResponseJson
+	{
+		reqJsonBody, err := json.Marshal(reqCreateRoom)
+		if err != nil {
+			t.Fatalf("marshal request body: %v", err)
+		}
+
+		w := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPost, "/room/create", bytes.NewBuffer(reqJsonBody))
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", createUserResponseJson.Token))
+		mux.ServeHTTP(w, req)
+		rsp := w.Result()
+		defer func() {
+			_ = rsp.Body.Close()
+		}()
+
+		gotBody, err := io.ReadAll(rsp.Body)
+		if err != nil {
+			t.Fatalf("read body: %v", err)
+		}
+
+		// check expected key num
+		CheckJsonKeyNum(t, gotBody, 1)
+
+		if err := json.Unmarshal([]byte(gotBody), &createRoomResponseJson); err != nil {
+			t.Fatalf("json unmarshal: %v", err)
+		}
+
+		roomId := createRoomResponseJson.RoomId
+		if roomId <= 0 {
+			t.Fatalf("room id should be greater than 0 (got %d)", roomId)
+		}
+	}
+
+	return createUserResponseJson, createRoomResponseJson
 }

@@ -3,6 +3,7 @@ package room
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -36,7 +37,7 @@ func (ru *EndRoom) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		handler.RespondJson(ctx, w, &handler.ErrResponse{
-			Message: err.Error(),
+			Message: fmt.Sprintf("decode json: %s", err.Error()),
 		}, http.StatusInternalServerError)
 		return
 	}

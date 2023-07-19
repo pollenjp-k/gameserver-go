@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -38,7 +39,7 @@ func (ru *CreateUser) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var body CreateUserRequestJson
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		handler.RespondJson(ctx, w, &handler.ErrResponse{
-			Message: err.Error(),
+			Message: fmt.Sprintf("decode json: %s", err.Error()),
 		}, http.StatusInternalServerError)
 		return
 	}

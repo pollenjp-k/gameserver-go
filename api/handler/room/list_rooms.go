@@ -3,6 +3,7 @@ package room
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -26,6 +27,17 @@ type GetRoomList struct {
 	Validator *validator.Validate
 }
 
+type ListRoomResponseJsonItem struct {
+	RoomId          entity.RoomId `json:"room_id"`
+	LiveId          entity.LiveId `json:"live_id"`
+	JoinedUserCount int           `json:"joined_user_count"`
+	MaxUserCount    int           `json:"max_user_count"`
+}
+
+type ListRoomResponseJson struct {
+	RoomInfoList []*ListRoomResponseJsonItem `json:"room_info_list"`
+}
+
 func (ru *GetRoomList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	var body struct {
@@ -35,7 +47,7 @@ func (ru *GetRoomList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		handler.RespondJson(ctx, w, &handler.ErrResponse{
-			Message: err.Error(),
+			Message: fmt.Sprintf("decode json: %s", err.Error()),
 		}, http.StatusInternalServerError)
 		return
 	}
@@ -59,16 +71,9 @@ func (ru *GetRoomList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	type item struct {
-		RoomId          entity.RoomId `json:"room_id"`
-		LiveId          entity.LiveId `json:"live_id"`
-		JoinedUserCount int           `json:"joined_user_count"`
-		MaxUserCount    int           `json:"max_user_count"`
-	}
-
-	roomInfoList := make([]*item, len(rooms))
+	roomInfoList := make([]*ListRoomResponseJsonItem, len(rooms))
 	for i, roomInfo := range rooms {
-		roomInfoList[i] = &item{
+		roomInfoList[i] = &ListRoomResponseJsonItem{
 			RoomId:          roomInfo.RoomId,
 			LiveId:          roomInfo.LiveId,
 			JoinedUserCount: roomInfo.JoinedUserCount,
@@ -76,9 +81,7 @@ func (ru *GetRoomList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	rsp := struct {
-		RoomInfoList []*item `json:"room_info_list"`
-	}{
+	rsp := ListRoomResponseJson{
 		RoomInfoList: roomInfoList,
 	}
 	handler.RespondJson(ctx, w, rsp, http.StatusOK)

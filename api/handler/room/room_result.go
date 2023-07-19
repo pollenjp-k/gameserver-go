@@ -3,6 +3,7 @@ package room
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -33,7 +34,7 @@ func (ru *RoomResult) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		handler.RespondJson(ctx, w, &handler.ErrResponse{
-			Message: err.Error(),
+			Message: fmt.Sprintf("decode json: %s", err.Error()),
 		}, http.StatusInternalServerError)
 		return
 	}
