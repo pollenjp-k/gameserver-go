@@ -28,8 +28,8 @@ type CreateRoom struct {
 }
 
 type CreateRoomRequestJson struct {
-	// 0 の可能性がある
-	LiveId           entity.LiveId         `json:"live_id"`
+	// create room request は Live ID が 1 以上の必要がある (-> `validate:"required"`)
+	LiveId           entity.LiveId         `json:"live_id" validate:"required"`
 	SelectDifficulty entity.LiveDifficulty `json:"select_difficulty" validate:"required"`
 }
 
@@ -50,10 +50,6 @@ func (ru *CreateRoom) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := ru.Validator.Struct(body); err != nil {
 		handler.RespondJson(ctx, w, &handler.ErrResponse{
 			Message: err.Error(),
-			// Details: []string{
-			// 	"failed to validate request body",
-			// 	fmt.Sprintf("%+v", body),
-			// },
 		}, http.StatusBadRequest)
 		return
 	}

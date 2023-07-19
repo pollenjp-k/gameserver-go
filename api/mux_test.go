@@ -237,7 +237,7 @@ func TestNewMuxRoomCreate(t *testing.T) {
 	{
 		reqJsonBody := []byte(
 			`{
-			"live_id": 0,
+			"live_id": 1,
 			"select_difficulty": 1
 			}`,
 		)
@@ -292,7 +292,7 @@ func TestNewMuxRoomListAll(t *testing.T) {
 	}
 
 	sampleRoom := entity.Room{
-		LiveId: 0,
+		LiveId: 1,
 	}
 	liveDifficulty := entity.LiveDifficultyNormal
 
@@ -315,6 +315,7 @@ func TestNewMuxRoomListAll(t *testing.T) {
 
 	var rspListRoom roomHandler.ListRoomResponseJson
 	{
+		// live_id = 0 は wildcard
 		reqBody := []byte(`{
 			"live_id": 0
 		}`)
