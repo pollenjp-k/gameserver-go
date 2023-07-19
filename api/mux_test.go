@@ -270,7 +270,7 @@ func TestNewMuxRoomCreate(t *testing.T) {
 	}
 }
 
-// - `/room/create`
+// - `/room/List`
 func TestNewMuxRoomListAll(t *testing.T) {
 	t.Parallel()
 
@@ -296,7 +296,7 @@ func TestNewMuxRoomListAll(t *testing.T) {
 	}
 	liveDifficulty := entity.LiveDifficultyNormal
 
-	rspCreateUser, rspCreateRoom := CreateUserAndRoom(
+	_, rspCreateRoom := CreateUserAndRoom(
 		t,
 		mux,
 		userHandler.CreateUserRequestJson{
@@ -308,8 +308,6 @@ func TestNewMuxRoomListAll(t *testing.T) {
 			SelectDifficulty: liveDifficulty,
 		},
 	)
-
-	sampleUser.Token = rspCreateUser.Token
 
 	// `/room/list`
 
