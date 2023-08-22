@@ -28,6 +28,10 @@ type JoinRoom struct {
 	Validator *validator.Validate
 }
 
+type JoinRoomResponseJson struct {
+	JoinRoomResult entity.JoinRoomResult `json:"join_room_result"`
+}
+
 func (ru *JoinRoom) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	var body struct {
@@ -70,9 +74,7 @@ func (ru *JoinRoom) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rsp := struct {
-		JoinRoomResult entity.JoinRoomResult `json:"join_room_result"`
-	}{
+	rsp := JoinRoomResponseJson{
 		JoinRoomResult: result,
 	}
 	handler.RespondJson(ctx, w, rsp, http.StatusOK)
