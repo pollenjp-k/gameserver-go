@@ -29,6 +29,7 @@ generate: ## Generate codes
 
 .PHONY: test
 test: ## Execute tests
+	${MAKE} up
 	go test -race -shuffle=on ./...
 
 .PHONY: lint
