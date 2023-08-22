@@ -513,6 +513,20 @@ func TestNewMuxRoomJoin(t *testing.T) {
 	}
 }
 
+// TODO: `/room/wait` (room status: waiting)
+// TODO: `/room/wait` (room status: live started)
+// TODO: `/room/wait` (room status: dissolution)
+// TODO: `/room/start` (user: owner, room status: waiting)
+// TODO: `/room/start` (user: owner, other room status)
+// TODO: `/room/start` (user: not owner, other room status)
+// TODO: `/room/end` (user: owner or joined user, room status: live started)
+// TODO: `/room/end` (user: owner or joined user, room status: other status)
+// TODO: `/room/result` (user: joined user, room status: waiting)
+// TODO: `/room/result` (user: not joined user, room status: any)
+// TODO: `/room/result` (最初に result を受信したあと、 n秒間待つ。n秒感を超えたら result が返ってきていないユーザーの result を0にする。)
+// TODO: `/room/leave` (user: any, room status: waiting)
+// TODO: `/room/leave` (user: any, room status: live started)
+
 func FatalErrorWithStatusCodeAndBody(t *testing.T, expectedStatusCode int, gotStatusCode int, gotBody []byte) {
 	t.Helper()
 
