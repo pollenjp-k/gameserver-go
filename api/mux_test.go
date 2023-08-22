@@ -391,6 +391,19 @@ func TestNewMuxRoomListFilterByLiveId(t *testing.T) {
 		},
 	)
 
+	_, _ = CreateUserAndRoom(
+		t,
+		mux,
+		userHandler.CreateUserRequestJson{
+			Name:         "test user 2",
+			LeaderCardId: 1,
+		},
+		roomHandler.CreateRoomRequestJson{
+			LiveId:           entity.LiveId(2),
+			SelectDifficulty: entity.LiveDifficultyNormal,
+		},
+	)
+
 	// `/room/list`
 
 	filterLiveId := entity.LiveId(1)
@@ -422,17 +435,15 @@ func TestNewMuxRoomListFilterByLiveId(t *testing.T) {
 	}
 
 	{
-		roomMap := map[entity.RoomId]*roomHandler.ListRoomResponseJsonItem{}
-		roomIds := []entity.RoomId{}
+		roomMap := map[entity.LiveId]*roomHandler.ListRoomResponseJsonItem{}
 		for _, roomItem := range rspListRoom.RoomInfoList {
-			roomIds = append(roomIds, roomItem.RoomId)
-			roomMap[roomItem.RoomId] = roomItem
+			roomMap[roomItem.LiveId] = roomItem
 		}
 
-		testLiveId := entity.RoomId(2)
+		testLiveId := entity.LiveId(2)
 		if _, ok := roomMap[testLiveId]; ok {
 			// testLiveId は存在しないはず
-			t.Fatalf("test live id (%d) should not be found because filtered by %d: %v", testLiveId, filterLiveId, roomIds)
+			t.Fatalf("test live id (%d) should not be found because filtered by %d", testLiveId, filterLiveId)
 		}
 	}
 }
