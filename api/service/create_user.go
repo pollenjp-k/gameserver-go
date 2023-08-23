@@ -5,16 +5,16 @@ import (
 	"fmt"
 
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
 )
 
-//go:generate go run github.com/matryer/moq -out create_user_moq_test.go . CreateUserRepository
+// TODO: convert to //go:generate when writing tests
+// go:generate go run github.com/matryer/moq -out create_user_moq_test.go . CreateUserRepository
 type CreateUserRepository interface {
-	CreateUser(ctx context.Context, db repository.Execer, u *entity.User) error
+	CreateUser(ctx context.Context, db Execer, u *entity.User) error
 }
 
 type CreateUser struct {
-	DB   repository.Execer
+	DB   Execer
 	Repo CreateUserRepository
 }
 
@@ -24,11 +24,12 @@ func (ru *CreateUser) CreateUser(
 	leaderCard entity.LeaderCardIdIDType,
 ) (*entity.User, error) {
 	u := &entity.User{
-		Name: name,
+		Name:         name,
+		LeaderCardId: leaderCard,
 	}
 
 	if err := ru.Repo.CreateUser(ctx, ru.DB, u); err != nil {
-		return nil, fmt.Errorf("failed to register: %w", err)
+		return nil, fmt.Errorf("CreateUser: %w", err)
 	}
 	return u, nil
 }

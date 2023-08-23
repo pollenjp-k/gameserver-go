@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/pollenjp/gameserver-go/api/clock"
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
+	"github.com/pollenjp/gameserver-go/api/service"
 )
 
 func TestAuthorizer(t *testing.T) {
@@ -72,7 +72,7 @@ func TestAuthorizer(t *testing.T) {
 				Id:           1,
 				Name:         "test",
 				Token:        token,
-				LeaderCardId: 0,
+				LeaderCardId: 1,
 				CreatedAt:    c.Now(),
 				UpdatedAt:    c.Now(),
 			}
@@ -80,7 +80,7 @@ func TestAuthorizer(t *testing.T) {
 			moq := &AuthRepositoryMock{}
 			moq.GetUserFromTokenFunc = func(
 				_ context.Context,
-				_ repository.Queryer,
+				_ service.Queryer,
 				token entity.UserTokenType,
 			) (*entity.User, error) {
 				if tt.isOk {
@@ -110,7 +110,7 @@ func TestAuthorizer(t *testing.T) {
 				return
 			}
 
-			userId, ok := GetUserId(r.Context())
+			userId, ok := service.GetUserId(r.Context())
 			if !ok {
 				// 既に context に user id がセットされているはずなのにセットされていない
 				t.Error("user id is not set in context")

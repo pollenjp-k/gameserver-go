@@ -6,7 +6,6 @@ package service
 import (
 	"context"
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
 	"sync"
 )
 
@@ -20,7 +19,7 @@ var _ UserGetter = &UserGetterMock{}
 //
 //		// make and configure a mocked UserGetter
 //		mockedUserGetter := &UserGetterMock{
-//			GetUserFromIdFunc: func(ctx context.Context, db repository.Queryer, userId entity.UserID) (*entity.User, error) {
+//			GetUserFromIdFunc: func(ctx context.Context, db Queryer, userId entity.UserId) (*entity.User, error) {
 //				panic("mock out the GetUserFromId method")
 //			},
 //		}
@@ -31,7 +30,7 @@ var _ UserGetter = &UserGetterMock{}
 //	}
 type UserGetterMock struct {
 	// GetUserFromIdFunc mocks the GetUserFromId method.
-	GetUserFromIdFunc func(ctx context.Context, db repository.Queryer, userId entity.UserID) (*entity.User, error)
+	GetUserFromIdFunc func(ctx context.Context, db Queryer, userId entity.UserId) (*entity.User, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -40,23 +39,23 @@ type UserGetterMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// Db is the db argument value.
-			Db repository.Queryer
+			Db Queryer
 			// UserId is the userId argument value.
-			UserId entity.UserID
+			UserId entity.UserId
 		}
 	}
 	lockGetUserFromId sync.RWMutex
 }
 
 // GetUserFromId calls GetUserFromIdFunc.
-func (mock *UserGetterMock) GetUserFromId(ctx context.Context, db repository.Queryer, userId entity.UserID) (*entity.User, error) {
+func (mock *UserGetterMock) GetUserFromId(ctx context.Context, db Queryer, userId entity.UserId) (*entity.User, error) {
 	if mock.GetUserFromIdFunc == nil {
 		panic("UserGetterMock.GetUserFromIdFunc: method is nil but UserGetter.GetUserFromId was just called")
 	}
 	callInfo := struct {
 		Ctx    context.Context
-		Db     repository.Queryer
-		UserId entity.UserID
+		Db     Queryer
+		UserId entity.UserId
 	}{
 		Ctx:    ctx,
 		Db:     db,
@@ -74,13 +73,13 @@ func (mock *UserGetterMock) GetUserFromId(ctx context.Context, db repository.Que
 //	len(mockedUserGetter.GetUserFromIdCalls())
 func (mock *UserGetterMock) GetUserFromIdCalls() []struct {
 	Ctx    context.Context
-	Db     repository.Queryer
-	UserId entity.UserID
+	Db     Queryer
+	UserId entity.UserId
 } {
 	var calls []struct {
 		Ctx    context.Context
-		Db     repository.Queryer
-		UserId entity.UserID
+		Db     Queryer
+		UserId entity.UserId
 	}
 	mock.lockGetUserFromId.RLock()
 	calls = mock.calls.GetUserFromId

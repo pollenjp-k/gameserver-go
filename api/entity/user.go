@@ -5,12 +5,12 @@ import (
 	"time"
 )
 
-type UserID int64
+type UserId int64
 type LeaderCardIdIDType int64
 type UserTokenType string
 
 type User struct {
-	Id           UserID             `db:"id"`
+	Id           UserId             `db:"id"`
 	Name         string             `db:"name"`
 	Token        UserTokenType      `db:"token"`
 	LeaderCardId LeaderCardIdIDType `db:"leader_card_id"`
@@ -40,10 +40,9 @@ func (u *User) ValidateNotEmpty() error {
 	if u.Token == uZeroValue.Token {
 		return &UserValidationError{MemberName: "Token"}
 	}
-	// Allow Leader Card ID to be zero value
-	// if u.LeaderCardId == uZeroValue.LeaderCardId {
-	// 	return &UserValidationError{MemberName: "LeaderCardId"}
-	// }
+	if u.LeaderCardId == uZeroValue.LeaderCardId {
+		return &UserValidationError{MemberName: "LeaderCardId"}
+	}
 	if u.CreatedAt == uZeroValue.CreatedAt {
 		return &UserValidationError{MemberName: "LeaderCardId"}
 	}

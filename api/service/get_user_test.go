@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/pollenjp/gameserver-go/api/clock"
 	"github.com/pollenjp/gameserver-go/api/entity"
-	"github.com/pollenjp/gameserver-go/api/repository"
 )
 
 func TestGetUser(t *testing.T) {
@@ -38,7 +37,7 @@ func TestGetUser(t *testing.T) {
 				Id:           1,
 				Name:         "test",
 				Token:        entity.UserTokenType(uuid.NewString()),
-				LeaderCardId: 0,
+				LeaderCardId: 1,
 				CreatedAt:    c.Now(),
 				UpdatedAt:    c.Now(),
 			}
@@ -46,8 +45,8 @@ func TestGetUser(t *testing.T) {
 			moq := &UserGetterMock{}
 			moq.GetUserFromIdFunc = func(
 				_ context.Context,
-				_ repository.Queryer,
-				_ entity.UserID,
+				_ Queryer,
+				_ entity.UserId,
 			) (*entity.User, error) {
 				u := dummyUser
 				if err := u.ValidateNotEmpty(); err != nil {

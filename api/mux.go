@@ -10,6 +10,8 @@ import (
 	"github.com/pollenjp/gameserver-go/api/clock"
 	"github.com/pollenjp/gameserver-go/api/config"
 	"github.com/pollenjp/gameserver-go/api/handler"
+	"github.com/pollenjp/gameserver-go/api/handler/room"
+	"github.com/pollenjp/gameserver-go/api/handler/user"
 	"github.com/pollenjp/gameserver-go/api/repository"
 	"github.com/pollenjp/gameserver-go/api/service"
 )
@@ -23,7 +25,7 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 	mux := chi.NewRouter()
 	mux.HandleFunc(
 		"/health",
-		func(w http.ResponseWriter, r *http.Request) {
+		func(w http.ResponseWriter, _ *http.Request) {
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			_, _ = w.Write([]byte(`{"status": "ok"}`))
 		},
@@ -38,22 +40,21 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 	au := auth.NewAuthorizer(db, r)
 
 	{
-		v := validator.New()
-		cu := &handler.CreateUser{
+		cu := &user.CreateUser{
 			Service: &service.CreateUser{
 				DB:   db,
 				Repo: r,
 			},
-			Validator: v,
+			Validator: validator.New(),
 		}
-		me := &handler.UserMe{
+		me := &user.UserMe{
 			Service: &service.GetUser{
 				DB:   db,
 				Repo: r,
 			},
 			Validator: validator.New(),
 		}
-		uu := &handler.UpdateUser{
+		uu := &user.UpdateUser{
 			Service: &service.UpdateUser{
 				DB:   db,
 				Repo: r,
@@ -64,6 +65,75 @@ func NewMux(ctx context.Context, cfg *config.Config) (
 			r.Post("/create", cu.ServeHTTP)
 			r.Get("/me", handler.AuthMiddleware(au)(me).ServeHTTP)
 			r.Post("/update", handler.AuthMiddleware(au)(uu).ServeHTTP)
+		})
+	}
+
+	{
+		cr := &room.CreateRoom{
+			Service: &service.CreateRoom{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
+		rl := &room.GetRoomList{
+			Service: &service.GetRoomList{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
+		jr := &room.JoinRoom{
+			Service: &service.JoinRoom{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
+		wr := &room.WaitRoom{
+			Service: &service.WaitRoom{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
+		sr := &room.StartRoom{
+			Service: &service.StartRoom{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
+		er := &room.EndRoom{
+			Service: &service.EndRoom{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
+		rr := &room.RoomResult{
+			Service: &service.GetRoomResult{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
+		lr := &room.LeaveRoom{
+			Service: &service.LeaveRoom{
+				DB:   db,
+				Repo: r,
+			},
+			Validator: validator.New(),
+		}
+		mux.Route("/room", func(r chi.Router) {
+			r.Post("/create", handler.AuthMiddleware(au)(cr).ServeHTTP)
+			r.Post("/list", rl.ServeHTTP)
+			r.Post("/join", handler.AuthMiddleware(au)(jr).ServeHTTP)
+			r.Post("/wait", handler.AuthMiddleware(au)(wr).ServeHTTP)
+			r.Post("/start", handler.AuthMiddleware(au)(sr).ServeHTTP)
+			r.Post("/end", handler.AuthMiddleware(au)(er).ServeHTTP)
+			r.Post("/result", handler.AuthMiddleware(au)(rr).ServeHTTP)
+			r.Post("/leave", handler.AuthMiddleware(au)(lr).ServeHTTP)
 		})
 	}
 

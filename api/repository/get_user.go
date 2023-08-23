@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/pollenjp/gameserver-go/api/entity"
+	"github.com/pollenjp/gameserver-go/api/service"
 )
 
 // DB内のユーザ情報を取得
 func (r *Repository) GetUserFromId(
-	ctx context.Context, db Queryer, userId entity.UserID,
+	ctx context.Context, db service.Queryer, userId entity.UserId,
 ) (*entity.User, error) {
 	u := &entity.User{}
 	sql := `
@@ -33,7 +34,7 @@ func (r *Repository) GetUserFromId(
 
 // DB内のユーザ情報を取得
 func (r *Repository) GetUserFromToken(
-	ctx context.Context, db Queryer, userToken entity.UserTokenType,
+	ctx context.Context, db service.Queryer, userToken entity.UserTokenType,
 ) (*entity.User, error) {
 	u := &entity.User{}
 	sql := `SELECT

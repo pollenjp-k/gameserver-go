@@ -8,6 +8,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 	"github.com/pollenjp/gameserver-go/api/entity"
+	"github.com/pollenjp/gameserver-go/api/service"
 )
 
 // user table にユーザを追加
@@ -18,7 +19,7 @@ import (
 //   - `entity.User.Created`
 //   - `entity.User.Modified`
 func (r *Repository) CreateUser(
-	ctx context.Context, db Execer, u *entity.User,
+	ctx context.Context, db service.Execer, u *entity.User,
 ) error {
 	u.Token = entity.UserTokenType(uuid.NewString())
 	u.CreatedAt = r.Clocker.Now()
@@ -51,8 +52,8 @@ func (r *Repository) CreateUser(
 		var mysqlErr *mysql.MySQLError
 
 		// primary key 重複エラー
-		if errors.As(err, &mysqlErr) && mysqlErr.Number == ErrCodeMySQLDuplicateEntry {
-			return fmt.Errorf("cannot create same name user: %w", ErrAlreadyEntry)
+		if errors.As(err, &mysqlErr) && mysqlErr.Number == service.ErrCodeMySQLDuplicateEntry {
+			return fmt.Errorf("cannot create same name user: %w", service.ErrAlreadyEntry)
 		}
 
 		return err
@@ -63,7 +64,7 @@ func (r *Repository) CreateUser(
 		return err
 	}
 
-	u.Id = entity.UserID(id)
+	u.Id = entity.UserId(id)
 	if err := u.ValidateNotEmpty(); err != nil {
 		return err
 	}

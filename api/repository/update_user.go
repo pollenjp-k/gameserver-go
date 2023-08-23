@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/pollenjp/gameserver-go/api/entity"
+	"github.com/pollenjp/gameserver-go/api/service"
 )
 
 // User情報として以下の内容を更新
@@ -12,7 +13,7 @@ import (
 // - LeaderCardId
 // - UpdatedAt (自動設定)
 func (r *Repository) UpdateUser(
-	ctx context.Context, db Execer, newUser *entity.User,
+	ctx context.Context, db service.Execer, newUser *entity.User,
 ) error {
 	sql := `
 		UPDATE
