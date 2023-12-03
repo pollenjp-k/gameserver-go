@@ -1,6 +1,6 @@
 # gameserver-go
 
-This repository is **golang**-implemented [KLabServerCamp/gameserver](https://github.com/KLabServerCamp/gameserver).
+This repository is a **golang** implementation of [KLabServerCamp/gameserver](https://github.com/KLabServerCamp/gameserver).
 
 |          | Language | repo |
 |:--       |:--       |:--   |
